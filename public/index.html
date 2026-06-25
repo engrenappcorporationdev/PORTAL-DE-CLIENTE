@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Clientes - ENGRENAPP</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated Background Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                <p class="auth-subtitle">Portal de Clientes</p>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginUsername">Usuário</label>
+                    <input type="text" id="loginUsername" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <p class="auth-footer">
+                    <a href="#" id="showForgotPassword">Esqueceu a senha?</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Page -->
+    <div id="forgotPasswordPage" class="page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                <p class="auth-subtitle">Recuperar Senha</p>
+            </div>
+            <form id="forgotPasswordForm" class="auth-form">
+                <div class="form-group">
+                    <label for="forgotEmail">Email ou Telefone</label>
+                    <input type="text" id="forgotEmail" name="contact" required placeholder="Digite seu email ou telefone">
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar Código</button>
+                <p class="auth-footer">
+                    <a href="#" id="showLoginFromForgot">Voltar ao Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Page -->
+    <div id="resetPasswordPage" class="page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                <p class="auth-subtitle">Redefinir Senha</p>
+            </div>
+            <form id="resetPasswordForm" class="auth-form">
+                <div class="form-group">
+                    <label for="resetCode">Código de Recuperação</label>
+                    <input type="text" id="resetCode" name="code" required placeholder="Digite o código recebido">
+                </div>
+                <div class="form-group">
+                    <label for="resetNewPassword">Nova Senha</label>
+                    <input type="password" id="resetNewPassword" name="new_password" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="resetConfirmPassword">Confirmar Nova Senha</label>
+                    <input type="password" id="resetConfirmPassword" name="confirm_password" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary">Redefinir Senha</button>
+                <p class="auth-footer">
+                    <a href="#" id="showLoginFromReset">Voltar ao Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="page">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <span class="nav-logo">ENGREN<span class="logo-accent">APP</span></span>
+                    <span class="nav-badge">Admin</span>
+                </div>
+                <div class="nav-menu">
+                    <button class="nav-item active" data-tab="clients">Clientes</button>
+                    <button class="nav-item" data-tab="applications">Aplicativos</button>
+                    <button class="nav-item" data-tab="users">Usuários</button>
+                </div>
+                <div class="nav-user">
+                    <span id="adminUsername" class="nav-username"></span>
+                    <button id="adminLogout" class="btn-logout">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <!-- Clients Tab -->
+            <div id="clientsTab" class="tab-content active">
+                <div class="tab-header">
+                    <h2>Gerenciar Clientes</h2>
+                    <button id="addClientBtn" class="btn btn-primary">+ Novo Cliente</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Empresa</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Usuário</th>
+                                <th>Licenças</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Applications Tab -->
+            <div id="applicationsTab" class="tab-content">
+                <div class="tab-header">
+                    <h2>Gerenciar Aplicativos</h2>
+                    <button id="addAppBtn" class="btn btn-primary">+ Novo Aplicativo</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Cliente</th>
+                                <th>Versão Android</th>
+                                <th>Versão PC</th>
+                                <th>Site</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="usersTab" class="tab-content">
+                <div class="tab-header">
+                    <h2>Usuários do Sistema</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Usuário</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Função</th>
+                                <th>Usuário Filho</th>
+                                <th>Criado em</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Client Dashboard -->
+    <div id="clientDashboard" class="page">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <span class="nav-logo">ENGREN<span class="logo-accent">APP</span></span>
+                    <span class="nav-badge">Cliente</span>
+                </div>
+                <div class="nav-user">
+                    <span id="clientUsername" class="nav-username"></span>
+                    <button id="clientLogout" class="btn-logout">Sair</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="client-content">
+            <div class="client-header">
+                <h1>Meus Aplicativos</h1>
+                <p>Baixe seus aplicativos e acesse seus serviços</p>
+            </div>
+
+            <div id="clientApps" class="apps-grid">
+            </div>
+
+            <div id="noAppsMessage" class="no-data" style="display: none;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                    <line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+                <p>Nenhum aplicativo disponível ainda.</p>
+                <p>Entre em contato com o suporte para mais informações.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Add Client -->
+    <div id="addClientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Cliente</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="addClientForm" class="modal-form">
+                <div class="form-group">
+                    <label for="newClientUsername">Usuário *</label>
+                    <input type="text" id="newClientUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="newClientPassword">Senha *</label>
+                    <input type="password" id="newClientPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="newClientFullName">Nome Completo</label>
+                    <input type="text" id="newClientFullName" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="newClientEmail">Email</label>
+                    <input type="email" id="newClientEmail" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="newClientCompanyName">Nome da Empresa</label>
+                    <input type="text" id="newClientCompanyName" name="company_name">
+                </div>
+                <div class="form-group">
+                    <label for="newClientPhone">Telefone</label>
+                    <input type="tel" id="newClientPhone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="newClientLicenses">Licenças</label>
+                    <input type="number" id="newClientLicenses" name="licenses" value="1" min="1">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Edit Client -->
+    <div id="editClientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Cliente</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="editClientForm" class="modal-form">
+                <input type="hidden" id="editClientId" name="id">
+                <div class="form-group">
+                    <label for="editClientCompanyName">Nome da Empresa</label>
+                    <input type="text" id="editClientCompanyName" name="company_name">
+                </div>
+                <div class="form-group">
+                    <label for="editClientPhone">Telefone</label>
+                    <input type="tel" id="editClientPhone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="editClientLicenses">Licenças</label>
+                    <input type="number" id="editClientLicenses" name="licenses" min="1">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Edit User -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Usuário</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="editUserForm" class="modal-form">
+                <input type="hidden" id="editUserId" name="id">
+                <div class="form-group">
+                    <label for="editUserUsername">Usuário</label>
+                    <input type="text" id="editUserUsername" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="editUserFullName">Nome Completo</label>
+                    <input type="text" id="editUserFullName" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmail">Email</label>
+                    <input type="email" id="editUserEmail" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="editUserPassword">Nova Senha (deixe em branco para manter)</label>
+                    <input type="password" id="editUserPassword" name="password">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Child User -->
+    <div id="addChildUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Usuário Filho (Licença)</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="addChildUserForm" class="modal-form">
+                <input type="hidden" id="childParentUserId" name="parent_user_id">
+                <div class="form-group">
+                    <label for="childUsername">Usuário *</label>
+                    <input type="text" id="childUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="childPassword">Senha *</label>
+                    <input type="password" id="childPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="childFullName">Nome Completo</label>
+                    <input type="text" id="childFullName" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="childEmail">Email</label>
+                    <input type="email" id="childEmail" name="email">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Application -->
+    <div id="addAppModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Aplicativo</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="addAppForm" class="modal-form">
+                <div class="form-group">
+                    <label for="appClientId">Cliente *</label>
+                    <select id="appClientId" name="client_id" required>
+                        <option value="">Selecione um cliente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="appName">Nome do Aplicativo *</label>
+                    <input type="text" id="appName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="appDescription">Descrição</label>
+                    <textarea id="appDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="appAndroidFile">Arquivo Android (APK)</label>
+                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk">
+                </div>
+                <div class="form-group">
+                    <label for="appAndroidVersion">Versão Android</label>
+                    <input type="text" id="appAndroidVersion" name="android_version" placeholder="1.0.0">
+                </div>
+                <div class="form-group">
+                    <label for="appPcFile">Arquivo PC (EXE)</label>
+                    <input type="file" id="appPcFile" name="pc_file" accept=".exe">
+                </div>
+                <div class="form-group">
+                    <label for="appPcVersion">Versão PC</label>
+                    <input type="text" id="appPcVersion" name="pc_version" placeholder="1.0.0">
+                </div>
+                <div class="form-group">
+                    <label for="appWebsiteUrl">URL do Site</label>
+                    <input type="url" id="appWebsiteUrl" name="website_url" placeholder="https://">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
