@@ -747,3 +747,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// ===== Expose functions to global scope for inline event handlers =====
+window.editClient = editClient;
+window.deleteClient = deleteClient;
+window.editUser = editUser;
+window.deleteUser = deleteUser;
+window.addChildUser = addChildUser;
+window.deleteChildUser = deleteChildUser;
