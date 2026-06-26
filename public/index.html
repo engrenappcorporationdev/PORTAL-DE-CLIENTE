@@ -33,7 +33,7 @@
             </div>
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
-                    <label for="loginUsername">Usuário</label>
+                    <label for="loginUsername">Usuario</label>
                     <input type="text" id="loginUsername" name="username" required>
                 </div>
                 <div class="form-group">
@@ -53,14 +53,14 @@
         <div class="auth-container">
             <div class="auth-header">
                 <h1>Recuperar Senha</h1>
-                <p>Insira seu usuário ou email</p>
+                <p>Insira seu usuario ou email</p>
             </div>
             <form id="forgotPasswordForm" class="auth-form">
                 <div class="form-group">
-                    <label for="forgotContact">Usuário ou Email</label>
+                    <label for="forgotContact">Usuario ou Email</label>
                     <input type="text" id="forgotContact" name="contact" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Enviar Link de Recuperação</button>
+                <button type="submit" class="btn btn-primary btn-full">Enviar Link de Recuperacao</button>
             </form>
             <div class="auth-footer">
                 <button id="showLoginFromForgot" class="btn-link">Voltar ao Login</button>
@@ -99,7 +99,7 @@
                 <div class="nav-menu">
                     <button class="nav-item active" data-tab="clients">Clientes</button>
                     <button class="nav-item" data-tab="applications">Aplicativos</button>
-                    <button class="nav-item" data-tab="users">Usuários</button>
+                    <button class="nav-item" data-tab="users">Usuarios</button>
                 </div>
                 <div class="nav-user">
                     <span id="adminUsername" class="nav-username"></span>
@@ -123,9 +123,9 @@
                                 <th>Nome</th>
                                 <th>Email</th>
                                 <th>Telefone</th>
-                                <th>Usuário</th>
-                                <th>Licenças</th>
-                                <th>Ações</th>
+                                <th>Usuario</th>
+                                <th>Licencas</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="clientsTableBody">
@@ -146,10 +146,10 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Cliente</th>
-                                <th>Versão Android</th>
-                                <th>Versão PC</th>
+                                <th>Versao Android</th>
+                                <th>Versao PC</th>
                                 <th>Site</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="applicationsTableBody">
@@ -161,19 +161,19 @@
             <!-- Users Tab -->
             <div id="usersTab" class="tab-content">
                 <div class="tab-header">
-                    <h2>Usuários do Sistema</h2>
+                    <h2>Usuarios do Sistema</h2>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Usuário</th>
+                                <th>Usuario</th>
                                 <th>Nome</th>
                                 <th>Email</th>
-                                <th>Função</th>
-                                <th>Usuário Filho</th>
+                                <th>Funcao</th>
+                                <th>Usuario Filho</th>
                                 <th>Criado em</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="usersTableBody">
@@ -202,7 +202,7 @@
         <main class="client-content">
             <div class="client-header">
                 <h1>Meus Aplicativos</h1>
-                <p>Baixe seus aplicativos e acesse seus serviços</p>
+                <p>Baixe seus aplicativos e acesse seus servicos</p>
             </div>
 
             <div id="clientApps" class="apps-grid">
@@ -213,8 +213,8 @@
                     <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
                     <line x1="12" y1="18" x2="12.01" y2="18"/>
                 </svg>
-                <p>Nenhum aplicativo disponível ainda.</p>
-                <p>Entre em contato com o suporte para mais informações.</p>
+                <p>Nenhum aplicativo disponivel ainda.</p>
+                <p>Entre em contato com o suporte para mais informacoes.</p>
             </div>
         </main>
     </div>
@@ -228,7 +228,7 @@
             </div>
             <form id="addClientForm" class="modal-form">
                 <div class="form-group">
-                    <label for="newClientUsername">Usuário *</label>
+                    <label for="newClientUsername">Usuario *</label>
                     <input type="text" id="newClientUsername" name="username" required>
                 </div>
                 <div class="form-group">
@@ -252,7 +252,7 @@
                     <input type="tel" id="newClientPhone" name="phone">
                 </div>
                 <div class="form-group">
-                    <label for="newClientLicenses">Licenças</label>
+                    <label for="newClientLicenses">Licencas</label>
                     <input type="number" id="newClientLicenses" name="licenses" value="1" min="1">
                 </div>
                 <div class="modal-actions">
@@ -281,7 +281,7 @@
                     <input type="tel" id="editClientPhone" name="phone">
                 </div>
                 <div class="form-group">
-                    <label for="editClientLicenses">Licenças</label>
+                    <label for="editClientLicenses">Licencas</label>
                     <input type="number" id="editClientLicenses" name="licenses" min="1">
                 </div>
                 <div class="modal-actions">
@@ -296,13 +296,13 @@
     <div id="editUserModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Editar Usuário</h2>
+                <h2>Editar Usuario</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <form id="editUserForm" class="modal-form">
                 <input type="hidden" id="editUserId" name="id">
                 <div class="form-group">
-                    <label for="editUserUsername">Usuário</label>
+                    <label for="editUserUsername">Usuario</label>
                     <input type="text" id="editUserUsername" name="username">
                 </div>
                 <div class="form-group">
@@ -329,13 +329,13 @@
     <div id="addChildUserModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Adicionar Usuário Filho (Licença)</h2>
+                <h2>Adicionar Usuario Filho (Licenca)</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <form id="addChildUserForm" class="modal-form">
                 <input type="hidden" id="childParentUserId" name="parent_user_id">
                 <div class="form-group">
-                    <label for="childUsername">Usuário *</label>
+                    <label for="childUsername">Usuario *</label>
                     <input type="text" id="childUsername" name="username" required>
                 </div>
                 <div class="form-group">
@@ -377,11 +377,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="appAndroidVersion">Versão Android</label>
+                    <label for="appAndroidVersion">Versao Android</label>
                     <input type="text" id="appAndroidVersion" name="android_version">
                 </div>
                 <div class="form-group">
-                    <label for="appPcVersion">Versão PC</label>
+                    <label for="appPcVersion">Versao PC</label>
                     <input type="text" id="appPcVersion" name="pc_version">
                 </div>
                 <div class="form-group">
