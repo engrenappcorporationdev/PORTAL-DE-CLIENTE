@@ -28,23 +28,23 @@
     <div id="loginPage" class="page active">
         <div class="auth-container">
             <div class="auth-header">
-                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
-                <p class="auth-subtitle">Portal de Clientes</p>
+                <h1>ENGREN<span class="logo-accent">APP</span></h1>
+                <p>Portal de Clientes</p>
             </div>
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
                     <label for="loginUsername">Usuário</label>
-                    <input type="text" id="loginUsername" name="username" required autocomplete="username">
+                    <input type="text" id="loginUsername" name="username" required>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Senha</label>
-                    <input type="password" id="loginPassword" name="password" required autocomplete="current-password">
+                    <input type="password" id="loginPassword" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Entrar</button>
-                <p class="auth-footer">
-                    <a href="#" id="showForgotPassword">Esqueceu a senha?</a>
-                </p>
+                <button type="submit" class="btn btn-primary btn-full">Entrar</button>
             </form>
+            <div class="auth-footer">
+                <button id="showForgotPassword" class="btn-link">Esqueci minha senha</button>
+            </div>
         </div>
     </div>
 
@@ -52,19 +52,19 @@
     <div id="forgotPasswordPage" class="page">
         <div class="auth-container">
             <div class="auth-header">
-                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
-                <p class="auth-subtitle">Recuperar Senha</p>
+                <h1>Recuperar Senha</h1>
+                <p>Insira seu usuário ou email</p>
             </div>
             <form id="forgotPasswordForm" class="auth-form">
                 <div class="form-group">
-                    <label for="forgotEmail">Email ou Telefone</label>
-                    <input type="text" id="forgotEmail" name="contact" required placeholder="Digite seu email ou telefone">
+                    <label for="forgotContact">Usuário ou Email</label>
+                    <input type="text" id="forgotContact" name="contact" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Enviar Código</button>
-                <p class="auth-footer">
-                    <a href="#" id="showLoginFromForgot">Voltar ao Login</a>
-                </p>
+                <button type="submit" class="btn btn-primary btn-full">Enviar Link de Recuperação</button>
             </form>
+            <div class="auth-footer">
+                <button id="showLoginFromForgot" class="btn-link">Voltar ao Login</button>
+            </div>
         </div>
     </div>
 
@@ -72,27 +72,19 @@
     <div id="resetPasswordPage" class="page">
         <div class="auth-container">
             <div class="auth-header">
-                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
-                <p class="auth-subtitle">Redefinir Senha</p>
+                <h1>Redefinir Senha</h1>
+                <p>Insira sua nova senha</p>
             </div>
             <form id="resetPasswordForm" class="auth-form">
                 <div class="form-group">
-                    <label for="resetCode">Código de Recuperação</label>
-                    <input type="text" id="resetCode" name="code" required placeholder="Digite o código recebido">
+                    <label for="resetPassword">Nova Senha</label>
+                    <input type="password" id="resetPassword" name="password" required>
                 </div>
-                <div class="form-group">
-                    <label for="resetNewPassword">Nova Senha</label>
-                    <input type="password" id="resetNewPassword" name="new_password" required autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="resetConfirmPassword">Confirmar Nova Senha</label>
-                    <input type="password" id="resetConfirmPassword" name="confirm_password" required autocomplete="new-password">
-                </div>
-                <button type="submit" class="btn btn-primary">Redefinir Senha</button>
-                <p class="auth-footer">
-                    <a href="#" id="showLoginFromReset">Voltar ao Login</a>
-                </p>
+                <button type="submit" class="btn btn-primary btn-full">Redefinir Senha</button>
             </form>
+            <div class="auth-footer">
+                <button id="showLoginFromReset" class="btn-link">Voltar ao Login</button>
+            </div>
         </div>
     </div>
 
@@ -252,7 +244,7 @@
                     <input type="email" id="newClientEmail" name="email">
                 </div>
                 <div class="form-group">
-                    <label for="newClientCompanyName">Nome da Empresa</label>
+                    <label for="newClientCompanyName">Empresa</label>
                     <input type="text" id="newClientCompanyName" name="company_name">
                 </div>
                 <div class="form-group">
@@ -265,7 +257,7 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="submit" class="btn btn-primary">Criar</button>
                 </div>
             </form>
         </div>
@@ -281,7 +273,7 @@
             <form id="editClientForm" class="modal-form">
                 <input type="hidden" id="editClientId" name="id">
                 <div class="form-group">
-                    <label for="editClientCompanyName">Nome da Empresa</label>
+                    <label for="editClientCompanyName">Empresa</label>
                     <input type="text" id="editClientCompanyName" name="company_name">
                 </div>
                 <div class="form-group">
@@ -360,7 +352,7 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="submit" class="btn btn-primary">Criar</button>
                 </div>
             </form>
         </div>
@@ -375,42 +367,38 @@
             </div>
             <form id="addAppForm" class="modal-form">
                 <div class="form-group">
+                    <label for="appName">Nome *</label>
+                    <input type="text" id="appName" name="name" required>
+                </div>
+                <div class="form-group">
                     <label for="appClientId">Cliente *</label>
                     <select id="appClientId" name="client_id" required>
                         <option value="">Selecione um cliente</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="appName">Nome do Aplicativo *</label>
-                    <input type="text" id="appName" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="appDescription">Descrição</label>
-                    <textarea id="appDescription" name="description" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="appAndroidFile">Arquivo Android (APK)</label>
-                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk">
-                </div>
-                <div class="form-group">
                     <label for="appAndroidVersion">Versão Android</label>
-                    <input type="text" id="appAndroidVersion" name="android_version" placeholder="1.0.0">
-                </div>
-                <div class="form-group">
-                    <label for="appPcFile">Arquivo PC (EXE)</label>
-                    <input type="file" id="appPcFile" name="pc_file" accept=".exe">
+                    <input type="text" id="appAndroidVersion" name="android_version">
                 </div>
                 <div class="form-group">
                     <label for="appPcVersion">Versão PC</label>
-                    <input type="text" id="appPcVersion" name="pc_version" placeholder="1.0.0">
+                    <input type="text" id="appPcVersion" name="pc_version">
                 </div>
                 <div class="form-group">
-                    <label for="appWebsiteUrl">URL do Site</label>
-                    <input type="url" id="appWebsiteUrl" name="website_url" placeholder="https://">
+                    <label for="appSite">Site</label>
+                    <input type="url" id="appSite" name="site">
+                </div>
+                <div class="form-group">
+                    <label for="appAndroidFile">Arquivo Android</label>
+                    <input type="file" id="appAndroidFile" name="android_file">
+                </div>
+                <div class="form-group">
+                    <label for="appPcFile">Arquivo PC</label>
+                    <input type="file" id="appPcFile" name="pc_file">
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="submit" class="btn btn-primary">Criar</button>
                 </div>
             </form>
         </div>
