@@ -57,8 +57,8 @@
             </div>
             <form id="forgotPasswordForm" class="auth-form">
                 <div class="form-group">
-                    <label for="forgotEmail">Email ou Telefone</label>
-                    <input type="text" id="forgotEmail" name="contact" required placeholder="Digite seu email ou telefone">
+                    <label for="forgotContact">Email ou Usuário</label>
+                    <input type="text" id="forgotContact" name="contact" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Enviar Código</button>
                 <p class="auth-footer">
@@ -78,15 +78,15 @@
             <form id="resetPasswordForm" class="auth-form">
                 <div class="form-group">
                     <label for="resetCode">Código de Recuperação</label>
-                    <input type="text" id="resetCode" name="code" required placeholder="Digite o código recebido">
+                    <input type="text" id="resetCode" name="code" required>
                 </div>
                 <div class="form-group">
-                    <label for="resetNewPassword">Nova Senha</label>
-                    <input type="password" id="resetNewPassword" name="new_password" required autocomplete="new-password">
+                    <label for="newPassword">Nova Senha</label>
+                    <input type="password" id="newPassword" name="new_password" required>
                 </div>
                 <div class="form-group">
-                    <label for="resetConfirmPassword">Confirmar Nova Senha</label>
-                    <input type="password" id="resetConfirmPassword" name="confirm_password" required autocomplete="new-password">
+                    <label for="confirmPassword">Confirmar Senha</label>
+                    <input type="password" id="confirmPassword" name="confirm_password" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Redefinir Senha</button>
                 <p class="auth-footer">
@@ -98,170 +98,168 @@
 
     <!-- Admin Dashboard -->
     <div id="adminDashboard" class="page">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-brand">
-                    <span class="nav-logo">ENGREN<span class="logo-accent">APP</span></span>
-                    <span class="nav-badge">Admin</span>
+        <div class="dashboard-container">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h1 class="dashboard-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                    <span class="dashboard-subtitle">Painel Administrativo</span>
                 </div>
-                <div class="nav-menu">
-                    <button class="nav-item active" data-tab="clients">Clientes</button>
-                    <button class="nav-item" data-tab="applications">Aplicativos</button>
-                    <button class="nav-item" data-tab="users">Usuários</button>
+                <div class="header-right">
+                    <span class="user-info">Olá, <span id="adminUsername">Admin</span></span>
+                    <button id="adminLogout" class="btn btn-secondary">Sair</button>
                 </div>
-                <div class="nav-user">
-                    <span id="adminUsername" class="nav-username"></span>
-                    <button id="adminLogout" class="btn-logout">Sair</button>
-                </div>
-            </div>
-        </nav>
+            </header>
 
-        <main class="dashboard-content">
-            <!-- Clients Tab -->
-            <div id="clientsTab" class="tab-content active">
-                <div class="tab-header">
-                    <h2>Gerenciar Clientes</h2>
-                    <button id="addClientBtn" class="btn btn-primary">+ Novo Cliente</button>
+            <nav class="dashboard-nav">
+                <div class="nav-item active" data-tab="clients">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-label">Clientes</span>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Empresa</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Telefone</th>
-                                <th>Usuário</th>
-                                <th>Licenças</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientsTableBody">
-                        </tbody>
-                    </table>
+                <div class="nav-item" data-tab="applications">
+                    <span class="nav-icon">📱</span>
+                    <span class="nav-label">Aplicativos</span>
                 </div>
-            </div>
+                <div class="nav-item" data-tab="users">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-label">Usuários</span>
+                </div>
+            </nav>
 
-            <!-- Applications Tab -->
-            <div id="applicationsTab" class="tab-content">
-                <div class="tab-header">
-                    <h2>Gerenciar Aplicativos</h2>
-                    <button id="addAppBtn" class="btn btn-primary">+ Novo Aplicativo</button>
+            <main class="dashboard-content">
+                <!-- Clients Tab -->
+                <div id="clientsTab" class="tab-content active">
+                    <div class="tab-header">
+                        <h2>Gerenciar Clientes</h2>
+                        <button id="addClientBtn" class="btn btn-primary">Adicionar Cliente</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Empresa</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Usuário</th>
+                                    <th>Licenças</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Cliente</th>
-                                <th>Versão Android</th>
-                                <th>Versão PC</th>
-                                <th>Site</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="applicationsTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
-            <!-- Users Tab -->
-            <div id="usersTab" class="tab-content">
-                <div class="tab-header">
-                    <h2>Usuários do Sistema</h2>
+                <!-- Applications Tab -->
+                <div id="applicationsTab" class="tab-content">
+                    <div class="tab-header">
+                        <h2>Gerenciar Aplicativos</h2>
+                        <button id="addAppBtn" class="btn btn-primary">Adicionar Aplicativo</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Cliente</th>
+                                    <th>Versão Android</th>
+                                    <th>Versão PC</th>
+                                    <th>Site</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Usuário</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Função</th>
-                                <th>Usuário Filho</th>
-                                <th>Criado em</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                        </tbody>
-                    </table>
+
+                <!-- Users Tab -->
+                <div id="usersTab" class="tab-content">
+                    <div class="tab-header">
+                        <h2>Gerenciar Usuários</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Função</th>
+                                    <th>Usuário Filho</th>
+                                    <th>Criado em</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
     <!-- Client Dashboard -->
     <div id="clientDashboard" class="page">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-brand">
-                    <span class="nav-logo">ENGREN<span class="logo-accent">APP</span></span>
-                    <span class="nav-badge">Cliente</span>
+        <div class="dashboard-container">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h1 class="dashboard-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                    <span class="dashboard-subtitle">Portal do Cliente</span>
                 </div>
-                <div class="nav-user">
-                    <span id="clientUsername" class="nav-username"></span>
-                    <button id="clientLogout" class="btn-logout">Sair</button>
+                <div class="header-right">
+                    <span class="user-info">Olá, <span id="clientUsername">Cliente</span></span>
+                    <button id="clientLogout" class="btn btn-secondary">Sair</button>
                 </div>
-            </div>
-        </nav>
+            </header>
 
-        <main class="client-content">
-            <div class="client-header">
-                <h1>Meus Aplicativos</h1>
-                <p>Baixe seus aplicativos e acesse seus serviços</p>
-            </div>
-
-            <div id="clientApps" class="apps-grid">
-            </div>
-
-            <div id="noAppsMessage" class="no-data" style="display: none;">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
-                    <line x1="12" y1="18" x2="12.01" y2="18"/>
-                </svg>
-                <p>Nenhum aplicativo disponível ainda.</p>
-                <p>Entre em contato com o suporte para mais informações.</p>
-            </div>
-        </main>
+            <main class="dashboard-content">
+                <div class="client-apps-container">
+                    <h2>Meus Aplicativos</h2>
+                    <div id="clientApps" class="apps-grid"></div>
+                    <div id="noAppsMessage" class="no-apps-message">
+                        <p>Nenhum aplicativo disponível no momento.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <!-- Modal: Add Client -->
+    <!-- Add Client Modal -->
     <div id="addClientModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Novo Cliente</h2>
+                <h2>Adicionar Cliente</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <form id="addClientForm" class="modal-form">
                 <div class="form-group">
-                    <label for="newClientUsername">Usuário *</label>
-                    <input type="text" id="newClientUsername" name="username" required>
+                    <label for="addClientUsername">Usuário</label>
+                    <input type="text" id="addClientUsername" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="newClientPassword">Senha *</label>
-                    <input type="password" id="newClientPassword" name="password" required>
+                    <label for="addClientPassword">Senha</label>
+                    <input type="password" id="addClientPassword" name="password" required>
                 </div>
                 <div class="form-group">
-                    <label for="newClientFullName">Nome Completo</label>
-                    <input type="text" id="newClientFullName" name="full_name">
+                    <label for="addClientCompanyName">Empresa</label>
+                    <input type="text" id="addClientCompanyName" name="company_name">
                 </div>
                 <div class="form-group">
-                    <label for="newClientEmail">Email</label>
-                    <input type="email" id="newClientEmail" name="email">
+                    <label for="addClientFullName">Nome Completo</label>
+                    <input type="text" id="addClientFullName" name="full_name">
                 </div>
                 <div class="form-group">
-                    <label for="newClientCompanyName">Nome da Empresa</label>
-                    <input type="text" id="newClientCompanyName" name="company_name">
+                    <label for="addClientEmail">Email</label>
+                    <input type="email" id="addClientEmail" name="email">
                 </div>
                 <div class="form-group">
-                    <label for="newClientPhone">Telefone</label>
-                    <input type="tel" id="newClientPhone" name="phone">
+                    <label for="addClientPhone">Telefone</label>
+                    <input type="tel" id="addClientPhone" name="phone">
                 </div>
                 <div class="form-group">
-                    <label for="newClientLicenses">Licenças</label>
-                    <input type="number" id="newClientLicenses" name="licenses" value="1" min="1">
+                    <label for="addClientLicenses">Licenças</label>
+                    <input type="number" id="addClientLicenses" name="licenses" value="1" min="1">
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
@@ -271,7 +269,7 @@
         </div>
     </div>
 
-    <!-- Modal: Edit Client -->
+    <!-- Edit Client Modal -->
     <div id="editClientModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -281,7 +279,7 @@
             <form id="editClientForm" class="modal-form">
                 <input type="hidden" id="editClientId" name="id">
                 <div class="form-group">
-                    <label for="editClientCompanyName">Nome da Empresa</label>
+                    <label for="editClientCompanyName">Empresa</label>
                     <input type="text" id="editClientCompanyName" name="company_name">
                 </div>
                 <div class="form-group">
@@ -300,7 +298,7 @@
         </div>
     </div>
 
-    <!-- Modal: Edit User -->
+    <!-- Edit User Modal -->
     <div id="editUserModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -322,7 +320,7 @@
                     <input type="email" id="editUserEmail" name="email">
                 </div>
                 <div class="form-group">
-                    <label for="editUserPassword">Nova Senha (deixe em branco para manter)</label>
+                    <label for="editUserPassword">Nova Senha (opcional)</label>
                     <input type="password" id="editUserPassword" name="password">
                 </div>
                 <div class="modal-actions">
@@ -333,7 +331,7 @@
         </div>
     </div>
 
-    <!-- Modal: Add Child User -->
+    <!-- Add Child User Modal -->
     <div id="addChildUserModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -343,11 +341,11 @@
             <form id="addChildUserForm" class="modal-form">
                 <input type="hidden" id="childParentUserId" name="parent_user_id">
                 <div class="form-group">
-                    <label for="childUsername">Usuário *</label>
+                    <label for="childUsername">Usuário</label>
                     <input type="text" id="childUsername" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="childPassword">Senha *</label>
+                    <label for="childPassword">Senha</label>
                     <input type="password" id="childPassword" name="password" required>
                 </div>
                 <div class="form-group">
@@ -366,22 +364,20 @@
         </div>
     </div>
 
-    <!-- Modal: Add Application -->
+    <!-- Add Application Modal -->
     <div id="addAppModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Novo Aplicativo</h2>
+                <h2>Adicionar Aplicativo</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <form id="addAppForm" class="modal-form">
                 <div class="form-group">
-                    <label for="appClientId">Cliente *</label>
-                    <select id="appClientId" name="client_id" required>
-                        <option value="">Selecione um cliente</option>
-                    </select>
+                    <label for="appClientId">Cliente</label>
+                    <select id="appClientId" name="client_id" required></select>
                 </div>
                 <div class="form-group">
-                    <label for="appName">Nome do Aplicativo *</label>
+                    <label for="appName">Nome do Aplicativo</label>
                     <input type="text" id="appName" name="name" required>
                 </div>
                 <div class="form-group">
