@@ -47,7 +47,6 @@ app.use(express.static('public', {
     }
   }
 }));
-app.use(express.static('.')); // Serve arquivos da raiz também
 
 // Configuração de upload
 const storage = multer.diskStorage({
