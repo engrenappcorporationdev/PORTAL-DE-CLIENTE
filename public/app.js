@@ -172,7 +172,7 @@ async function apiCall(endpoint, options = {}) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || 'Erro na requisi├º├úo');
+    throw new Error(data.error || 'Erro na requisicao');
   }
 
   return data;
@@ -418,6 +418,15 @@ async function deleteChildUser(childUserId) {
     showToast(error.message, 'error');
   }
 }
+
+// ===== Expose functions to global scope for inline event handlers =====
+window.editClient = editClient;
+window.editUser = editUser;
+window.deleteUser = deleteUser;
+window.deleteApplication = deleteApplication;
+window.openAddChildUserModal = openAddChildUserModal;
+window.addChildUser = addChildUser;
+window.deleteChildUser = deleteChildUser;
 
 async function addApplication(formData) {
   try {
@@ -720,12 +729,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
-
-// ===== Expose functions to global scope for inline event handlers =====
-window.editClient = editClient;
-window.editUser = editUser;
-window.deleteUser = deleteUser;
-window.deleteApplication = deleteApplication;
-window.openAddChildUserModal = openAddChildUserModal;
-window.addChildUser = addChildUser;
-window.deleteChildUser = deleteChildUser;
