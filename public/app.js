@@ -1,5 +1,5 @@
 // ===== API Configuration =====
-const API_BASE = '/api'; // URL relativa funciona tanto em dev quanto em produção
+const API_BASE = '/api';
 
 // ===== State Management =====
 let currentUser = null;
@@ -24,7 +24,7 @@ function connectSocket() {
   socket.on('new_application', (application) => {
     console.log('Novo aplicativo recebido:', application);
     showToast('Novo aplicativo disponível!', 'success');
-    loadClientData(); // Recarregar os aplicativos
+    loadClientData();
   });
 
   socket.on('disconnect', () => {
@@ -83,7 +83,7 @@ async function login(username, password) {
     } else {
       showPage('client');
       document.getElementById('clientUsername').textContent = currentUser.username;
-      connectSocket(); // Conectar WebSocket para clientes
+      connectSocket();
       loadClientData();
     }
   } catch (error) {
@@ -144,7 +144,7 @@ async function resetPassword(code, newPassword, confirmPassword) {
 }
 
 function logout() {
-  disconnectSocket(); // Desconectar WebSocket
+  disconnectSocket();
   token = null;
   currentUser = null;
   localStorage.removeItem('token');
@@ -314,7 +314,6 @@ async function addClient(formData) {
   }
 }
 
-// Funções para editar clientes
 async function editClient(clientId) {
   try {
     const clients = await apiCall('/admin/clients');
@@ -347,7 +346,6 @@ async function updateClient(formData) {
   }
 }
 
-// Funções para editar usuários
 async function editUser(userId) {
   try {
     const users = await apiCall('/admin/users');
@@ -384,7 +382,6 @@ async function updateUser(formData) {
   }
 }
 
-// Funções para usuários filhos (licenças)
 async function openAddChildUserModal(parentUserId) {
   document.getElementById('childParentUserId').value = parentUserId;
   document.getElementById('childUsername').value = '';
@@ -469,7 +466,6 @@ async function loadClientsForSelect() {
   }
 }
 
-// ===== Client Dashboard =====
 async function loadClientData() {
   try {
     const applications = await apiCall('/client/applications');
@@ -565,7 +561,6 @@ function renderClientApps(applications) {
   `).join('');
 }
 
-// ===== Modal Management =====
 function openModal(modalId) {
   document.getElementById(modalId).classList.add('active');
 }
@@ -574,7 +569,6 @@ function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
 }
 
-// ===== Toast Notification =====
 function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');
   toast.textContent = message;
@@ -585,9 +579,7 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
-// ===== Event Listeners =====
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if user is already logged in
   if (token) {
     try {
       currentUser = JSON.parse(localStorage.getItem('user'));
@@ -599,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           showPage('client');
           document.getElementById('clientUsername').textContent = currentUser.username;
-          connectSocket(); // Conectar WebSocket para clientes
+          connectSocket();
           loadClientData();
         }
       }
@@ -608,39 +600,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Login form
   document.getElementById('loginForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     login(formData.get('username'), formData.get('password'));
   });
 
-  // Show forgot password page
   document.getElementById('showForgotPassword').addEventListener('click', (e) => {
     e.preventDefault();
     showPage('forgotPassword');
   });
 
-  // Show login from forgot password
   document.getElementById('showLoginFromForgot').addEventListener('click', (e) => {
     e.preventDefault();
     showPage('login');
   });
 
-  // Show login from reset password
   document.getElementById('showLoginFromReset').addEventListener('click', (e) => {
     e.preventDefault();
     showPage('login');
   });
 
-  // Forgot password form
   document.getElementById('forgotPasswordForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     requestPasswordReset(formData.get('contact'));
   });
 
-  // Reset password form
   document.getElementById('resetPasswordForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -651,13 +637,9 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   });
 
-  // Admin logout
   document.getElementById('adminLogout').addEventListener('click', logout);
-
-  // Client logout
   document.getElementById('clientLogout').addEventListener('click', logout);
 
-  // Tab navigation
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -669,46 +651,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Add client modal
   document.getElementById('addClientBtn').addEventListener('click', () => {
     openModal('addClientModal');
   });
 
-  // Add application modal
   document.getElementById('addAppBtn').addEventListener('click', () => {
     loadClientsForSelect();
     openModal('addAppModal');
   });
 
-  // Add client form
   document.getElementById('addClientForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     addClient(Object.fromEntries(formData));
   });
 
-  // Edit client form
   document.getElementById('editClientForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     updateClient(Object.fromEntries(formData));
   });
 
-  // Edit user form
   document.getElementById('editUserForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     updateUser(Object.fromEntries(formData));
   });
 
-  // Add child user form
   document.getElementById('addChildUserForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     addChildUser(Object.fromEntries(formData));
   });
 
-  // Add application form
   document.getElementById('addAppForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -725,7 +700,6 @@ document.addEventListener('DOMContentLoaded', () => {
     addApplication(appData);
   });
 
-  // Modal close buttons
   document.querySelectorAll('.modal-close').forEach(btn => {
     btn.addEventListener('click', () => {
       closeModal(btn.closest('.modal').id);
@@ -738,7 +712,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Close modal on outside click
   document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
