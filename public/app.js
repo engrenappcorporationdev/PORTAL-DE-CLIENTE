@@ -1,4 +1,4 @@
-// ===== API Configuration =====
+﻿// ===== API Configuration =====
 const API_BASE = '/api';
 
 // ===== State Management =====
@@ -23,7 +23,7 @@ function connectSocket() {
 
   socket.on('new_application', (application) => {
     console.log('Novo aplicativo recebido:', application);
-    showToast('Novo aplicativo disponível!', 'success');
+    showToast('Novo aplicativo dispon├¡vel!', 'success');
     loadClientData();
   });
 
@@ -103,7 +103,7 @@ async function requestPasswordReset(contact) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Erro ao solicitar recuperação de senha');
+      throw new Error(data.error || 'Erro ao solicitar recupera├º├úo de senha');
     }
 
     showToast(data.message, 'success');
@@ -115,7 +115,7 @@ async function requestPasswordReset(contact) {
 
 async function resetPassword(code, newPassword, confirmPassword) {
   if (newPassword !== confirmPassword) {
-    showToast('As senhas não coincidem', 'error');
+    showToast('As senhas n├úo coincidem', 'error');
     return;
   }
 
@@ -172,7 +172,7 @@ async function apiCall(endpoint, options = {}) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || 'Erro na requisição');
+    throw new Error(data.error || 'Erro na requisi├º├úo');
   }
 
   return data;
@@ -227,7 +227,7 @@ function renderClientsTable(clients) {
       <td>
         <div class="action-buttons">
           <button class="btn btn-sm btn-primary" onclick="editClient(${client.id})">Editar</button>
-          <button class="btn btn-sm btn-success" onclick="openAddChildUserModal(${client.user_id})">+ Licença</button>
+          <button class="btn btn-sm btn-success" onclick="openAddChildUserModal(${client.user_id})">+ Licen├ºa</button>
           <button class="btn btn-sm btn-danger" onclick="deleteUser(${client.user_id})">Excluir</button>
         </div>
       </td>
@@ -261,7 +261,7 @@ function renderUsersTable(users) {
       <td>${user.full_name || '-'}</td>
       <td>${user.email || '-'}</td>
       <td><span class="nav-badge">${user.role === 'admin' ? 'Admin' : 'Cliente'}</span></td>
-      <td>${user.is_child ? 'Sim' : 'Não'}</td>
+      <td>${user.is_child ? 'Sim' : 'N├úo'}</td>
       <td>${new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
       <td>
         <div class="action-buttons">
@@ -276,11 +276,11 @@ function renderUsersTable(users) {
 }
 
 async function deleteUser(userId) {
-  if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+  if (!confirm('Tem certeza que deseja excluir este usu├írio?')) return;
 
   try {
     await apiCall(`/admin/users/${userId}`, { method: 'DELETE' });
-    showToast('Usuário excluído com sucesso!', 'success');
+    showToast('Usu├írio exclu├¡do com sucesso!', 'success');
     loadAdminData();
   } catch (error) {
     showToast(error.message, 'error');
@@ -292,7 +292,7 @@ async function deleteApplication(appId) {
 
   try {
     await apiCall(`/admin/applications/${appId}`, { method: 'DELETE' });
-    showToast('Aplicativo excluído com sucesso!', 'success');
+    showToast('Aplicativo exclu├¡do com sucesso!', 'success');
     loadApplications();
   } catch (error) {
     showToast(error.message, 'error');
@@ -374,7 +374,7 @@ async function updateUser(formData) {
       method: 'PUT',
       body: JSON.stringify(data)
     });
-    showToast('Usuário atualizado com sucesso!', 'success');
+    showToast('Usu├írio atualizado com sucesso!', 'success');
     closeModal('editUserModal');
     loadAdminData();
   } catch (error) {
@@ -398,7 +398,7 @@ async function addChildUser(formData) {
       method: 'POST',
       body: JSON.stringify(formData)
     });
-    showToast('Usuário filho criado com sucesso!', 'success');
+    showToast('Usu├írio filho criado com sucesso!', 'success');
     closeModal('addChildUserModal');
     document.getElementById('addChildUserForm').reset();
     loadAdminData();
@@ -408,11 +408,11 @@ async function addChildUser(formData) {
 }
 
 async function deleteChildUser(childUserId) {
-  if (!confirm('Tem certeza que deseja excluir este usuário filho?')) return;
+  if (!confirm('Tem certeza que deseja excluir este usu├írio filho?')) return;
 
   try {
     await apiCall(`/admin/child-users/${childUserId}`, { method: 'DELETE' });
-    showToast('Usuário filho excluído com sucesso!', 'success');
+    showToast('Usu├írio filho exclu├¡do com sucesso!', 'success');
     loadAdminData();
   } catch (error) {
     showToast(error.message, 'error');
@@ -497,7 +497,7 @@ function renderClientApps(applications) {
         </div>
         <h3 class="app-card-title">${app.name}</h3>
       </div>
-      <p class="app-card-description">${app.description || 'Sem descrição'}</p>
+      <p class="app-card-description">${app.description || 'Sem descri├º├úo'}</p>
       <div class="app-card-downloads">
         ${app.android_file ? `
           <a href="${API_BASE}/download/${app.android_file}" class="download-btn" download>
@@ -515,7 +515,7 @@ function renderClientApps(applications) {
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Android não disponível
+            Android n├úo dispon├¡vel
           </button>
         `}
         ${app.pc_file ? `
@@ -534,7 +534,7 @@ function renderClientApps(applications) {
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            PC não disponível
+            PC n├úo dispon├¡vel
           </button>
         `}
         ${app.website_url ? `
@@ -553,7 +553,7 @@ function renderClientApps(applications) {
               <polyline points="15 3 21 3 21 9"/>
               <line x1="10" y1="14" x2="21" y2="3"/>
             </svg>
-            Site não disponível
+            Site n├úo dispon├¡vel
           </button>
         `}
       </div>
