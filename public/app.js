@@ -23,7 +23,7 @@ function connectSocket() {
 
   socket.on('new_application', (application) => {
     console.log('Novo aplicativo recebido:', application);
-    showToast('Novo aplicativo dispon├¡vel!', 'success');
+    showToast('Novo aplicativo disponivel!', 'success');
     loadClientData();
   });
 
@@ -227,7 +227,7 @@ function renderClientsTable(clients) {
       <td>
         <div class="action-buttons">
           <button class="btn btn-sm btn-primary" onclick="editClient(${client.id})">Editar</button>
-          <button class="btn btn-sm btn-success" onclick="openAddChildUserModal(${client.user_id})">+ Licen├ºa</button>
+          <button class="btn btn-sm btn-success" onclick="openAddChildUserModal(${client.user_id})">+ Licenca</button>
           <button class="btn btn-sm btn-danger" onclick="deleteUser(${client.user_id})">Excluir</button>
         </div>
       </td>
@@ -261,7 +261,7 @@ function renderUsersTable(users) {
       <td>${user.full_name || '-'}</td>
       <td>${user.email || '-'}</td>
       <td><span class="nav-badge">${user.role === 'admin' ? 'Admin' : 'Cliente'}</span></td>
-      <td>${user.is_child ? 'Sim' : 'N├úo'}</td>
+      <td>${user.is_child ? 'Sim' : 'Nao'}</td>
       <td>${new Date(user.created_at).toLocaleDateString('pt-BR')}</td>
       <td>
         <div class="action-buttons">
@@ -276,11 +276,11 @@ function renderUsersTable(users) {
 }
 
 async function deleteUser(userId) {
-  if (!confirm('Tem certeza que deseja excluir este usu├írio?')) return;
+  if (!confirm('Tem certeza que deseja excluir este usuario?')) return;
 
   try {
     await apiCall(`/admin/users/${userId}`, { method: 'DELETE' });
-    showToast('Usu├írio exclu├¡do com sucesso!', 'success');
+    showToast('Usuario excluido com sucesso!', 'success');
     loadAdminData();
   } catch (error) {
     showToast(error.message, 'error');
@@ -398,7 +398,7 @@ async function addChildUser(formData) {
       method: 'POST',
       body: JSON.stringify(formData)
     });
-    showToast('Usu├írio filho criado com sucesso!', 'success');
+    showToast('Usuario filho criado com sucesso!', 'success');
     closeModal('addChildUserModal');
     document.getElementById('addChildUserForm').reset();
     loadAdminData();
@@ -408,11 +408,11 @@ async function addChildUser(formData) {
 }
 
 async function deleteChildUser(childUserId) {
-  if (!confirm('Tem certeza que deseja excluir este usu├írio filho?')) return;
+  if (!confirm('Tem certeza que deseja excluir este usuario filho?')) return;
 
   try {
     await apiCall(`/admin/child-users/${childUserId}`, { method: 'DELETE' });
-    showToast('Usu├írio filho exclu├¡do com sucesso!', 'success');
+    showToast('Usuario filho excluido com sucesso!', 'success');
     loadAdminData();
   } catch (error) {
     showToast(error.message, 'error');
