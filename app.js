@@ -130,6 +130,65 @@ async function apiCall(endpoint, options = {}) {
   return data;
 }
 
+function getFileExtension(filename) {
+  if (!filename) return '';
+  const index = filename.lastIndexOf('.');
+  return index >= 0 ? filename.slice(index) : '';
+}
+
+function normalizeWebsiteUrl(url) {
+  if (!url) return '';
+  const trimmed = String(url).trim();
+  if (!trimmed) return '';
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
+function buildDownloadName(appName, platform, filename) {
+  const ext = getFileExtension(filename);
+  const safeName = String(appName || 'arquivo').replace(/[^\w\s.-]/g, '').trim() || 'arquivo';
+  return `${safeName}-${platform}${ext}`;
+}
+
+async function downloadAppFile(filename, displayName) {
+  if (!token) {
+    showToast('Faça login para baixar arquivos', 'error');
+    return;
+  }
+
+  showToast('Preparando download...', 'success');
+
+  try {
+    const response = await fetch(`${API_BASE}/download/${encodeURIComponent(filename)}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || 'Erro ao baixar arquivo');
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = displayName || filename;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('Download iniciado!', 'success');
+  } catch (error) {
+    const fallbackUrl = `${API_BASE}/download/${encodeURIComponent(filename)}?token=${encodeURIComponent(token)}`;
+    const opened = window.open(fallbackUrl, '_blank');
+    if (!opened) {
+      showToast(error.message, 'error');
+    } else {
+      showToast('Abrindo download...', 'success');
+    }
+  }
+}
+
 // ===== Admin Dashboard =====
 async function loadAdminData() {
   await Promise.all([
@@ -182,7 +241,6 @@ function renderUsersTable(clients) {
       <td>
         <div class="action-buttons">
           <button class="btn btn-sm btn-secondary" onclick="toggleLicenses('${client.user_id}')">Ver Licenças</button>
-          <button class="btn btn-sm btn-success" onclick="openAddLicenseModal('${client.user_id}')">+ Licença</button>
           <button class="btn btn-sm btn-primary" onclick="showClientDetails('${client.id}')">Detalhes</button>
         </div>
       </td>
@@ -223,11 +281,7 @@ async function loadLicensePanel(parentUserId) {
 
   panel.innerHTML = '<p class="license-loading">Carregando licenças...</p>';
 
-  const panelHeader = `
-    <div class="license-panel-header">
-      <h4>Licenças adicionais</h4>
-      <button class="btn btn-sm btn-success" onclick="openAddLicenseModal('${parentUserId}')">+ Adicionar Licença</button>
-    </div>`;
+  const panelHeader = '<div class="license-panel-header"><h4>Licenças adicionais</h4></div>';
 
   try {
     const licenses = await apiCall(`/admin/child-users/${parentUserId}`);
@@ -608,10 +662,15 @@ async function addApplication(formData) {
   try {
     const form = new FormData();
     Object.keys(formData).forEach(key => {
-      if (formData[key] instanceof File) {
-        form.append(key, formData[key]);
-      } else {
-        form.append(key, formData[key]);
+      const value = formData[key];
+      if (value instanceof File) {
+        if (value.size > 0) {
+          form.append(key, value);
+        }
+        return;
+      }
+      if (value !== undefined && value !== null && value !== '') {
+        form.append(key, value);
       }
     });
 
@@ -672,7 +731,57 @@ function renderClientApps(applications) {
   }
 
   noAppsMessage.style.display = 'none';
-  container.innerHTML = applications.map(app => `
+  container.innerHTML = applications.map(app => {
+    const siteUrl = normalizeWebsiteUrl(app.website_url);
+    const androidName = app.android_file ? buildDownloadName(app.name, 'android', app.android_file) : '';
+    const pcName = app.pc_file ? buildDownloadName(app.name, 'pc', app.pc_file) : '';
+
+    const downloadButtons = [];
+
+    if (app.android_file) {
+      downloadButtons.push(`
+        <button type="button" class="download-btn" onclick="downloadAppFile('${app.android_file}', '${androidName}')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Baixar Android${app.android_version ? ` (v${app.android_version})` : ''}
+        </button>
+      `);
+    }
+
+    if (app.pc_file) {
+      downloadButtons.push(`
+        <button type="button" class="download-btn" onclick="downloadAppFile('${app.pc_file}', '${pcName}')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Baixar PC / Desktop${app.pc_version ? ` (v${app.pc_version})` : ''}
+        </button>
+      `);
+    }
+
+    if (siteUrl) {
+      downloadButtons.push(`
+        <a href="${siteUrl}" target="_blank" rel="noopener noreferrer" class="website-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          Acessar Site
+        </a>
+      `);
+    }
+
+    if (downloadButtons.length === 0) {
+      downloadButtons.push('<p class="app-no-files">Nenhum arquivo ou site disponível para este aplicativo.</p>');
+    }
+
+    return `
     <div class="app-card">
       <div class="app-card-header">
         <div class="app-card-icon">
@@ -685,66 +794,11 @@ function renderClientApps(applications) {
       </div>
       <p class="app-card-description">${app.description || 'Sem descrição'}</p>
       <div class="app-card-downloads">
-        ${app.android_file ? `
-          <a href="${API_BASE}/download/${app.android_file}" class="download-btn" download>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download Android (v${app.android_version || 'N/A'})
-          </a>
-        ` : `
-          <button class="download-btn disabled" disabled>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Android não disponível
-          </button>
-        `}
-        ${app.pc_file ? `
-          <a href="${API_BASE}/download/${app.pc_file}" class="download-btn" download>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Download PC (v${app.pc_version || 'N/A'})
-          </a>
-        ` : `
-          <button class="download-btn disabled" disabled>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            PC não disponível
-          </button>
-        `}
-        ${app.website_url ? `
-          <a href="${app.website_url}" target="_blank" class="website-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-            Acessar Site
-          </a>
-        ` : `
-          <button class="website-link disabled" disabled>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-            Site não disponível
-          </button>
-        `}
+        ${downloadButtons.join('')}
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // ===== Modal Management =====
@@ -777,6 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.toggleLicenses = toggleLicenses;
   window.deleteLicense = deleteLicense;
   window.showClientDetails = showClientDetails;
+  window.downloadAppFile = downloadAppFile;
 
   // Check if user is already logged in
   if (token) {

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Portal de Clientes - ENGRENAPP</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,8 +100,8 @@
                     <h2>Gerenciar Clientes</h2>
                     <button id="addClientBtn" class="btn btn-primary">+ Novo Cliente</button>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
+                <div class="table-container table-scroll">
+                    <table class="data-table clients-table">
                         <thead>
                             <tr>
                                 <th>Empresa</th>
@@ -125,8 +125,8 @@
                     <h2>Gerenciar Aplicativos</h2>
                     <button id="addAppBtn" class="btn btn-primary">+ Novo Aplicativo</button>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
+                <div class="table-container table-scroll">
+                    <table class="data-table apps-table">
                         <thead>
                             <tr>
                                 <th>Nome</th>
@@ -149,7 +149,7 @@
                     <h2>Clientes e Licenças</h2>
                     <button id="addLicenseBtn" class="btn btn-primary btn-sm">+ Adicionar Licença</button>
                 </div>
-                <div class="table-container">
+                <div class="table-container table-scroll">
                     <table class="data-table users-table">
                         <thead>
                             <tr>
@@ -376,16 +376,18 @@
                     <textarea id="appDescription" name="description" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="appAndroidFile">Arquivo Android (APK)</label>
-                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk">
+                    <label for="appAndroidFile">Arquivo Android (APK, AAB ou ZIP)</label>
+                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk,.aab,.zip,application/vnd.android.package-archive,application/zip">
+                    <p class="form-hint">Formatos: APK, AAB, ZIP ou imagem/PDF para testes.</p>
                 </div>
                 <div class="form-group">
                     <label for="appAndroidVersion">Versão Android</label>
                     <input type="text" id="appAndroidVersion" name="android_version" placeholder="1.0.0">
                 </div>
                 <div class="form-group">
-                    <label for="appPcFile">Arquivo PC (EXE)</label>
-                    <input type="file" id="appPcFile" name="pc_file" accept=".exe">
+                    <label for="appPcFile">Arquivo PC / Desktop (EXE, MSI ou ZIP)</label>
+                    <input type="file" id="appPcFile" name="pc_file" accept=".exe,.msi,.zip,application/x-msdownload,application/zip">
+                    <p class="form-hint">Formatos: EXE, MSI, ZIP ou imagem/PDF para testes.</p>
                 </div>
                 <div class="form-group">
                     <label for="appPcVersion">Versão PC</label>
@@ -393,7 +395,8 @@
                 </div>
                 <div class="form-group">
                     <label for="appWebsiteUrl">URL do Site</label>
-                    <input type="url" id="appWebsiteUrl" name="website_url" placeholder="https://">
+                    <input type="url" id="appWebsiteUrl" name="website_url" placeholder="https://seusite.com.br">
+                    <p class="form-hint">Pode colocar com ou sem https://</p>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>

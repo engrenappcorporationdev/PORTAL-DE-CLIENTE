@@ -49,24 +49,60 @@ app.use(express.static('public', {
   }
 }));
 
+const ALLOWED_UPLOAD_EXTENSIONS = new Set([
+  '.apk', '.aab', '.exe', '.msi', '.zip', '.rar', '.7z',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf'
+]);
+
+const DOWNLOAD_MIME_TYPES = {
+  '.apk': 'application/vnd.android.package-archive',
+  '.aab': 'application/x-authorware-bin',
+  '.exe': 'application/vnd.microsoft.portable-executable',
+  '.msi': 'application/x-msi',
+  '.zip': 'application/zip',
+  '.rar': 'application/vnd.rar',
+  '.7z': 'application/x-7z-compressed',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.pdf': 'application/pdf'
+};
+
+function normalizeWebsiteUrl(url) {
+  if (!url) return null;
+  const trimmed = String(url).trim();
+  if (!trimmed) return null;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 // Configuração de upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = 'uploads';
+    const uploadDir = path.join(__dirname, 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   }
 });
 
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 100 * 1024 * 1024 } // 100MB
+  storage,
+  limits: { fileSize: 200 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_UPLOAD_EXTENSIONS.has(ext)) {
+      return cb(new Error(`Tipo de arquivo não permitido (${ext || 'sem extensão'}). Use APK, EXE, ZIP, imagens ou PDF.`));
+    }
+    cb(null, true);
+  }
 });
 
 // Inicialização do banco de dados Supabase
@@ -115,7 +151,11 @@ initializeDatabase();
 // Middleware de autenticação
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  let token = authHeader && authHeader.split(' ')[1];
+
+  if (!token && req.query.token) {
+    token = req.query.token;
+  }
 
   if (!token) {
     return res.status(401).json({ error: 'Token não fornecido' });
@@ -684,6 +724,7 @@ app.post('/api/admin/applications', authenticateToken, requireAdmin, upload.fiel
 
   const androidFile = req.files['android_file'] ? req.files['android_file'][0].filename : null;
   const pcFile = req.files['pc_file'] ? req.files['pc_file'][0].filename : null;
+  const normalizedWebsiteUrl = normalizeWebsiteUrl(website_url);
 
   try {
     const { data: application, error } = await supabase
@@ -696,7 +737,7 @@ app.post('/api/admin/applications', authenticateToken, requireAdmin, upload.fiel
         android_version,
         pc_file: pcFile,
         pc_version,
-        website_url
+        website_url: normalizedWebsiteUrl
       })
       .select()
       .single();
@@ -739,7 +780,7 @@ app.put('/api/admin/applications/:id', authenticateToken, requireAdmin, upload.f
       description,
       android_version,
       pc_version,
-      website_url
+      website_url: normalizeWebsiteUrl(website_url)
     };
 
     if (androidFile) {
@@ -871,16 +912,69 @@ app.get('/api/client/profile', authenticateToken, async (req, res) => {
   }
 });
 
-// Download de arquivos
-app.get('/api/download/:filename', authenticateToken, (req, res) => {
-  const filename = req.params.filename;
+// Download de arquivos (com verificação de acesso do cliente)
+app.get('/api/download/:filename', authenticateToken, async (req, res) => {
+  const filename = path.basename(req.params.filename);
   const filepath = path.join(__dirname, 'uploads', filename);
 
-  if (fs.existsSync(filepath)) {
-    res.download(filepath);
-  } else {
-    res.status(404).json({ error: 'Arquivo não encontrado' });
+  if (!fs.existsSync(filepath)) {
+    return res.status(404).json({ error: 'Arquivo não encontrado no servidor' });
   }
+
+  try {
+    if (req.user.role !== 'admin') {
+      const client = await getClientByUserId(req.user.id);
+      if (!client) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const { data: application, error } = await supabase
+        .from('applications')
+        .select('id, name, android_file, pc_file, client_id')
+        .eq('client_id', client.id)
+        .or(`android_file.eq.${filename},pc_file.eq.${filename}`)
+        .maybeSingle();
+
+      if (error || !application) {
+        return res.status(403).json({ error: 'Você não tem permissão para baixar este arquivo' });
+      }
+    }
+
+    const ext = path.extname(filename).toLowerCase();
+    const mimeType = DOWNLOAD_MIME_TYPES[ext] || 'application/octet-stream';
+    const { data: application } = await supabase
+      .from('applications')
+      .select('name')
+      .or(`android_file.eq.${filename},pc_file.eq.${filename}`)
+      .maybeSingle();
+
+    const displayName = application?.name
+      ? `${application.name}${ext}`
+      : filename;
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${displayName.replace(/"/g, '')}"`);
+    res.setHeader('Cache-Control', 'no-store');
+    res.download(filepath, displayName);
+  } catch (error) {
+    console.error('Erro no download:', error);
+    res.status(500).json({ error: 'Erro ao baixar arquivo' });
+  }
+});
+
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Arquivo muito grande. Limite: 200MB' });
+    }
+    return res.status(400).json({ error: error.message });
+  }
+
+  if (error) {
+    return res.status(400).json({ error: error.message || 'Erro no upload' });
+  }
+
+  next();
 });
 
 // WebSocket connection handling
