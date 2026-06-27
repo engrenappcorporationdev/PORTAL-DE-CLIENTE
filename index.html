@@ -43,6 +43,8 @@
                 <button type="submit" class="btn btn-primary">Entrar</button>
                 <p class="auth-footer">
                     <a href="#" id="showForgotPassword">Esqueceu a senha?</a>
+                    ·
+                    <a href="#" id="showSupport">Falar com o suporte</a>
                 </p>
             </form>
         </div>
@@ -65,6 +67,31 @@
                     <a href="#" id="showLoginFromForgot">Voltar ao Login</a>
                 </p>
             </form>
+        </div>
+    </div>
+
+    <!-- Support Page -->
+    <div id="supportPage" class="page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                <p class="auth-subtitle">Suporte</p>
+            </div>
+            <div class="support-content">
+                <div class="support-item">
+                    <h3>Email</h3>
+                    <p class="support-email">engrenappcorporationdev@gmail.com</p>
+                    <a href="mailto:engrenappcorporationdev@gmail.com" class="btn btn-primary">Enviar Email</a>
+                </div>
+                <div class="support-item">
+                    <h3>WhatsApp</h3>
+                    <p class="support-description">Fale conosco pelo WhatsApp para suporte rápido.</p>
+                    <a href="https://wa.me/5519999963829" target="_blank" class="btn btn-success">Falar no WhatsApp</a>
+                </div>
+                <p class="auth-footer">
+                    <a href="#" id="backToLogin">Voltar para Login</a>
+                </p>
+            </div>
         </div>
     </div>
 
@@ -132,6 +159,7 @@
                                 <th>Email</th>
                                 <th>Telefone</th>
                                 <th>Usuário</th>
+                                <th>Total Licenças</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -168,17 +196,18 @@
             <!-- Users Tab -->
             <div id="usersTab" class="tab-content">
                 <div class="tab-header">
-                    <h2>Usuários do Sistema</h2>
+                    <h2>Clientes e Licenças</h2>
+                    <button id="addLicenseBtn" class="btn btn-primary btn-sm">+ Adicionar Licença</button>
                 </div>
                 <div class="table-container">
-                    <table class="data-table">
+                    <table class="data-table users-table">
                         <thead>
                             <tr>
-                                <th>Usuário</th>
+                                <th>Empresa</th>
+                                <th>Cliente Base</th>
                                 <th>Nome</th>
                                 <th>Email</th>
-                                <th>Função</th>
-                                <th>Criado em</th>
+                                <th>Total Licenças</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -260,6 +289,115 @@
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Edit Client -->
+    <div id="editClientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Cliente</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="editClientForm" class="modal-form">
+                <input type="hidden" id="editClientId" name="id">
+                <div class="form-group">
+                    <label for="editClientCompanyName">Nome da Empresa</label>
+                    <input type="text" id="editClientCompanyName" name="company_name">
+                </div>
+                <div class="form-group">
+                    <label for="editClientFullName">Nome Completo</label>
+                    <input type="text" id="editClientFullName" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="editClientEmail">Email</label>
+                    <input type="email" id="editClientEmail" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="editClientPhone">Telefone</label>
+                    <input type="tel" id="editClientPhone" name="phone">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Edit User -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Licença</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="editUserForm" class="modal-form">
+                <input type="hidden" id="editUserId" name="id">
+                <div class="form-group">
+                    <label for="editUserUsername">Usuario</label>
+                    <input type="text" id="editUserUsername" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="editUserFullName">Nome Completo</label>
+                    <input type="text" id="editUserFullName" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmail">Email</label>
+                    <input type="email" id="editUserEmail" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="editUserPassword">Senha (deixe em branco para manter atual)</label>
+                    <input type="password" id="editUserPassword" name="password">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Client Details -->
+    <div id="clientDetailsModal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <div class="modal-header">
+                <h2>Detalhes do Cliente</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div id="clientDetailsContent" class="client-details-content">
+                <p class="license-loading">Carregando detalhes...</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary modal-cancel">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add License -->
+    <div id="addLicenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Licença</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="addLicenseForm" class="modal-form">
+                <div class="form-group">
+                    <label for="licenseClientSelect">Cliente *</label>
+                    <select id="licenseClientSelect" name="parent_user_id" required>
+                        <option value="">Selecione um cliente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="licenseCount">Quantidade</label>
+                    <input type="number" id="licenseCount" name="count" min="1" value="1" required>
+                </div>
+                <p class="form-hint">O usuário será gerado automaticamente (ex: 1nomecliente, 2nomecliente...) e a senha também.</p>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar Licença</button>
                 </div>
             </form>
         </div>
