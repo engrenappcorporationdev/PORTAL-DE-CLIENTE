@@ -850,7 +850,8 @@ app.delete('/api/admin/applications/:id', authenticateToken, requireAdmin, async
       .eq('id', appId);
 
     if (error) {
-      return res.status(500).json({ error: 'Erro ao excluir aplicativo' });
+      console.error('Erro ao excluir aplicativo:', error);
+      return res.status(500).json({ error: error.message || 'Erro ao excluir aplicativo' });
     }
 
     res.json({ message: 'Aplicativo excluído com sucesso' });

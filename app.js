@@ -351,13 +351,13 @@ function renderApplicationsTable(applications) {
   tbody.innerHTML = applications.map(app => `
     <tr>
       <td>${app.name}</td>
-      <td>${app.company_name}</td>
+      <td>${app.clients?.company_name || app.company_name || '-'}</td>
       <td>${app.android_version || '-'}</td>
       <td>${app.pc_version || '-'}</td>
-      <td>${app.website_url ? '<a href="' + app.website_url + '" target="_blank">Link</a>' : '-'}</td>
+      <td>${app.website_url ? '<a href="' + app.website_url + '" target="_blank" rel="noopener noreferrer">Link</a>' : '-'}</td>
       <td>
         <div class="action-buttons">
-          <button class="btn btn-sm btn-danger" onclick="deleteApplication(${app.id})">Excluir</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteApplication('${app.id}')">Excluir</button>
         </div>
       </td>
     </tr>
