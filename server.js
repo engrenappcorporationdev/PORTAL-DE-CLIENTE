@@ -77,6 +77,21 @@ function normalizeWebsiteUrl(url) {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
+function normalizeApplicationRecord(app) {
+  const client = Array.isArray(app.clients) ? app.clients[0] : app.clients;
+  return {
+    ...app,
+    clients: client || null,
+    company_name: client?.company_name || null
+  };
+}
+
+function getAppClientName(app) {
+  if (app?.company_name) return app.company_name;
+  const client = Array.isArray(app?.clients) ? app.clients[0] : app?.clients;
+  return client?.company_name || '—';
+}
+
 // Configuração de upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -865,16 +880,37 @@ app.get('/api/admin/applications', authenticateToken, requireAdmin, async (req, 
   try {
     const { data: applications, error } = await supabase
       .from('applications')
-      .select('*, clients(company_name)')
+      .select('*, clients(id, company_name, phone, users(username, full_name, email))')
       .order('created_at', { ascending: false });
 
     if (error) {
       return res.status(500).json({ error: 'Erro ao buscar aplicativos' });
     }
 
-    res.json(applications);
+    res.json((applications || []).map(normalizeApplicationRecord));
   } catch (error) {
     console.error('Erro ao buscar aplicativos:', error);
+    res.status(500).json({ error: 'Erro no servidor' });
+  }
+});
+
+app.get('/api/admin/applications/:id', authenticateToken, requireAdmin, async (req, res) => {
+  const appId = req.params.id;
+
+  try {
+    const { data: application, error } = await supabase
+      .from('applications')
+      .select('*, clients(id, company_name, phone, address, users(username, full_name, email))')
+      .eq('id', appId)
+      .single();
+
+    if (error || !application) {
+      return res.status(404).json({ error: 'Aplicativo não encontrado' });
+    }
+
+    res.json(normalizeApplicationRecord(application));
+  } catch (error) {
+    console.error('Erro ao buscar aplicativo:', error);
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });

@@ -346,22 +346,96 @@ function renderClientsTable(clients) {
   `).join('');
 }
 
+function getAppClientName(app) {
+  if (app?.company_name) return app.company_name;
+  const client = Array.isArray(app?.clients) ? app.clients[0] : app?.clients;
+  return client?.company_name || '—';
+}
+
+function getAppResourceBadges(app) {
+  const badges = [];
+  if (app.android_file) badges.push('<span class="app-badge app-badge-android">Android</span>');
+  if (app.pc_file) badges.push('<span class="app-badge app-badge-pc">PC</span>');
+  if (app.website_url) badges.push('<span class="app-badge app-badge-web">Site</span>');
+  if (badges.length === 0) {
+    return '<span class="app-badge app-badge-empty">Só cadastro</span>';
+  }
+  return badges.join('');
+}
+
 function renderApplicationsTable(applications) {
   const tbody = document.getElementById('applicationsTableBody');
   tbody.innerHTML = applications.map(app => `
     <tr>
-      <td>${app.name}</td>
-      <td>${app.clients?.company_name || app.company_name || '-'}</td>
-      <td>${app.android_version || '-'}</td>
-      <td>${app.pc_version || '-'}</td>
-      <td>${app.website_url ? '<a href="' + app.website_url + '" target="_blank" rel="noopener noreferrer">Link</a>' : '-'}</td>
+      <td><strong>${app.name}</strong></td>
+      <td><span class="client-name-badge">${getAppClientName(app)}</span></td>
+      <td><div class="app-badges">${getAppResourceBadges(app)}</div></td>
       <td>
         <div class="action-buttons">
+          <button class="btn btn-sm btn-primary" onclick="showAppDetails('${app.id}')">Ver Detalhes</button>
           <button class="btn btn-sm btn-danger" onclick="deleteApplication('${app.id}')">Excluir</button>
         </div>
       </td>
     </tr>
   `).join('');
+}
+
+async function showAppDetails(appId) {
+  const content = document.getElementById('appDetailsContent');
+  content.innerHTML = '<p class="license-loading">Carregando detalhes...</p>';
+  openModal('appDetailsModal');
+
+  try {
+    const app = await apiCall(`/admin/applications/${appId}`);
+    const client = app.clients || {};
+    const user = client.users || {};
+    const siteUrl = normalizeWebsiteUrl(app.website_url);
+
+    content.innerHTML = `
+      <div class="client-details-grid">
+        <section class="details-section">
+          <h3>Informações do Aplicativo</h3>
+          <dl class="details-list">
+            <div><dt>Nome</dt><dd>${app.name || '—'}</dd></div>
+            <div><dt>Descrição</dt><dd>${app.description || '—'}</dd></div>
+            <div><dt>Cadastro</dt><dd>${formatDate(app.created_at)}</dd></div>
+          </dl>
+        </section>
+
+        <section class="details-section">
+          <h3>Cliente Vinculado</h3>
+          <dl class="details-list">
+            <div><dt>Empresa</dt><dd>${getAppClientName(app)}</dd></div>
+            <div><dt>Contato</dt><dd>${user.full_name || '—'}</dd></div>
+            <div><dt>Usuário</dt><dd>${user.username || '—'}</dd></div>
+            <div><dt>Email</dt><dd>${user.email || '—'}</dd></div>
+            <div><dt>Telefone</dt><dd>${client.phone || '—'}</dd></div>
+          </dl>
+        </section>
+
+        <section class="details-section">
+          <h3>Arquivos e Acesso</h3>
+          <div class="app-details-resources">
+            <div class="resource-card ${app.android_file ? 'available' : 'unavailable'}">
+              <h4>Android</h4>
+              <p>${app.android_file ? 'Arquivo disponível' : 'Não enviado'}</p>
+              <span class="resource-version">Versão: ${app.android_version || '—'}</span>
+            </div>
+            <div class="resource-card ${app.pc_file ? 'available' : 'unavailable'}">
+              <h4>PC / Desktop</h4>
+              <p>${app.pc_file ? 'Arquivo disponível' : 'Não enviado'}</p>
+              <span class="resource-version">Versão: ${app.pc_version || '—'}</span>
+            </div>
+            <div class="resource-card ${siteUrl ? 'available' : 'unavailable'}">
+              <h4>Site</h4>
+              <p>${siteUrl ? `<a href="${siteUrl}" target="_blank" rel="noopener noreferrer">Abrir site</a>` : 'Não informado'}</p>
+            </div>
+          </div>
+        </section>
+      </div>`;
+  } catch (error) {
+    content.innerHTML = `<p class="license-empty">${error.message}</p>`;
+  }
 }
 
 async function deleteUser(userId) {
@@ -870,6 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.toggleLicenses = toggleLicenses;
   window.deleteLicense = deleteLicense;
   window.showClientDetails = showClientDetails;
+  window.showAppDetails = showAppDetails;
   window.downloadAppFile = downloadAppFile;
 
   // Check if user is already logged in

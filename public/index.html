@@ -131,9 +131,7 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Cliente</th>
-                                <th>Versão Android</th>
-                                <th>Versão PC</th>
-                                <th>Site</th>
+                                <th>Recursos</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -350,6 +348,22 @@
                     <button type="submit" class="btn btn-primary">Adicionar Licença</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal: App Details -->
+    <div id="appDetailsModal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <div class="modal-header">
+                <h2>Detalhes do Aplicativo</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div id="appDetailsContent" class="client-details-content">
+                <p class="license-loading">Carregando detalhes...</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary modal-cancel">Fechar</button>
+            </div>
         </div>
     </div>
 
