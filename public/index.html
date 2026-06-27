@@ -28,62 +28,47 @@
     <div id="loginPage" class="page active">
         <div class="auth-container">
             <div class="auth-header">
-                <h1>ENGREN<span class="logo-accent">APP</span></h1>
-                <p>Portal de Clientes</p>
+                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                <p class="auth-subtitle">Portal de Clientes</p>
             </div>
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
-                    <label for="loginUsername">Usuario</label>
-                    <input type="text" id="loginUsername" name="username" required>
+                    <label for="loginUsername">Usuário</label>
+                    <input type="text" id="loginUsername" name="username" required autocomplete="username">
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Senha</label>
-                    <input type="password" id="loginPassword" name="password" required>
+                    <input type="password" id="loginPassword" name="password" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <p class="auth-footer">
+                    <a href="#" id="showSupport">Falar com o suporte</a>
+                </p>
             </form>
-            <div class="auth-footer">
-                <button id="showForgotPassword" class="btn-link">Esqueci minha senha</button>
-            </div>
         </div>
     </div>
 
-    <!-- Forgot Password Page -->
-    <div id="forgotPasswordPage" class="page">
+    <!-- Support Page -->
+    <div id="supportPage" class="page">
         <div class="auth-container">
             <div class="auth-header">
-                <h1>Recuperar Senha</h1>
-                <p>Insira seu usuario ou email</p>
+                <h1 class="auth-logo">ENGREN<span class="logo-accent">APP</span></h1>
+                <p class="auth-subtitle">Suporte</p>
             </div>
-            <form id="forgotPasswordForm" class="auth-form">
-                <div class="form-group">
-                    <label for="forgotContact">Usuario ou Email</label>
-                    <input type="text" id="forgotContact" name="contact" required>
+            <div class="support-content">
+                <div class="support-item">
+                    <h3>Email</h3>
+                    <p class="support-email">engrenappcorporationdev@gmail.com</p>
+                    <a href="mailto:engrenappcorporationdev@gmail.com" class="btn btn-primary">Enviar Email</a>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Enviar Link de Recuperacao</button>
-            </form>
-            <div class="auth-footer">
-                <button id="showLoginFromForgot" class="btn-link">Voltar ao Login</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reset Password Page -->
-    <div id="resetPasswordPage" class="page">
-        <div class="auth-container">
-            <div class="auth-header">
-                <h1>Redefinir Senha</h1>
-                <p>Insira sua nova senha</p>
-            </div>
-            <form id="resetPasswordForm" class="auth-form">
-                <div class="form-group">
-                    <label for="resetPassword">Nova Senha</label>
-                    <input type="password" id="resetPassword" name="password" required>
+                <div class="support-item">
+                    <h3>WhatsApp</h3>
+                    <p class="support-description">Fale conosco pelo WhatsApp para suporte rápido.</p>
+                    <a href="https://wa.me/5519999963829" target="_blank" class="btn btn-success">Falar no WhatsApp</a>
                 </div>
-                <button type="submit" class="btn btn-primary btn-full">Redefinir Senha</button>
-            </form>
-            <div class="auth-footer">
-                <button id="showLoginFromReset" class="btn-link">Voltar ao Login</button>
+                <p class="auth-footer">
+                    <a href="#" id="backToLogin">Voltar para Login</a>
+                </p>
             </div>
         </div>
     </div>
@@ -99,7 +84,7 @@
                 <div class="nav-menu">
                     <button class="nav-item active" data-tab="clients">Clientes</button>
                     <button class="nav-item" data-tab="applications">Aplicativos</button>
-                    <button class="nav-item" data-tab="users">Usuarios</button>
+                    <button class="nav-item" data-tab="users">Usuários</button>
                 </div>
                 <div class="nav-user">
                     <span id="adminUsername" class="nav-username"></span>
@@ -123,9 +108,9 @@
                                 <th>Nome</th>
                                 <th>Email</th>
                                 <th>Telefone</th>
-                                <th>Usuario</th>
-                                <th>Licencas</th>
-                                <th>Acoes</th>
+                                <th>Usuário</th>
+                                <th>Total Licenças</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="clientsTableBody">
@@ -146,10 +131,10 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Cliente</th>
-                                <th>Versao Android</th>
-                                <th>Versao PC</th>
+                                <th>Versão Android</th>
+                                <th>Versão PC</th>
                                 <th>Site</th>
-                                <th>Acoes</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="applicationsTableBody">
@@ -161,19 +146,19 @@
             <!-- Users Tab -->
             <div id="usersTab" class="tab-content">
                 <div class="tab-header">
-                    <h2>Usuarios do Sistema</h2>
+                    <h2>Clientes e Licenças</h2>
+                    <button id="addLicenseBtn" class="btn btn-primary btn-sm">+ Adicionar Licença</button>
                 </div>
                 <div class="table-container">
-                    <table class="data-table">
+                    <table class="data-table users-table">
                         <thead>
                             <tr>
-                                <th>Usuario</th>
+                                <th>Empresa</th>
+                                <th>Cliente Base</th>
                                 <th>Nome</th>
                                 <th>Email</th>
-                                <th>Funcao</th>
-                                <th>Usuario Filho</th>
-                                <th>Criado em</th>
-                                <th>Acoes</th>
+                                <th>Total Licenças</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="usersTableBody">
@@ -202,7 +187,7 @@
         <main class="client-content">
             <div class="client-header">
                 <h1>Meus Aplicativos</h1>
-                <p>Baixe seus aplicativos e acesse seus servicos</p>
+                <p>Baixe seus aplicativos e acesse seus serviços</p>
             </div>
 
             <div id="clientApps" class="apps-grid">
@@ -213,8 +198,8 @@
                     <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
                     <line x1="12" y1="18" x2="12.01" y2="18"/>
                 </svg>
-                <p>Nenhum aplicativo disponivel ainda.</p>
-                <p>Entre em contato com o suporte para mais informacoes.</p>
+                <p>Nenhum aplicativo disponível ainda.</p>
+                <p>Entre em contato com o suporte para mais informações.</p>
             </div>
         </main>
     </div>
@@ -228,7 +213,7 @@
             </div>
             <form id="addClientForm" class="modal-form">
                 <div class="form-group">
-                    <label for="newClientUsername">Usuario *</label>
+                    <label for="newClientUsername">Usuário *</label>
                     <input type="text" id="newClientUsername" name="username" required>
                 </div>
                 <div class="form-group">
@@ -244,20 +229,16 @@
                     <input type="email" id="newClientEmail" name="email">
                 </div>
                 <div class="form-group">
-                    <label for="newClientCompanyName">Empresa</label>
+                    <label for="newClientCompanyName">Nome da Empresa</label>
                     <input type="text" id="newClientCompanyName" name="company_name">
                 </div>
                 <div class="form-group">
                     <label for="newClientPhone">Telefone</label>
                     <input type="tel" id="newClientPhone" name="phone">
                 </div>
-                <div class="form-group">
-                    <label for="newClientLicenses">Licencas</label>
-                    <input type="number" id="newClientLicenses" name="licenses" value="1" min="1">
-                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Criar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             </form>
         </div>
@@ -273,16 +254,20 @@
             <form id="editClientForm" class="modal-form">
                 <input type="hidden" id="editClientId" name="id">
                 <div class="form-group">
-                    <label for="editClientCompanyName">Empresa</label>
+                    <label for="editClientCompanyName">Nome da Empresa</label>
                     <input type="text" id="editClientCompanyName" name="company_name">
+                </div>
+                <div class="form-group">
+                    <label for="editClientFullName">Nome Completo</label>
+                    <input type="text" id="editClientFullName" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="editClientEmail">Email</label>
+                    <input type="email" id="editClientEmail" name="email">
                 </div>
                 <div class="form-group">
                     <label for="editClientPhone">Telefone</label>
                     <input type="tel" id="editClientPhone" name="phone">
-                </div>
-                <div class="form-group">
-                    <label for="editClientLicenses">Licencas</label>
-                    <input type="number" id="editClientLicenses" name="licenses" min="1">
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
@@ -296,7 +281,7 @@
     <div id="editUserModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Editar Usuario</h2>
+                <h2>Editar Licença</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <form id="editUserForm" class="modal-form">
@@ -314,7 +299,7 @@
                     <input type="email" id="editUserEmail" name="email">
                 </div>
                 <div class="form-group">
-                    <label for="editUserPassword">Nova Senha (deixe em branco para manter)</label>
+                    <label for="editUserPassword">Senha (deixe em branco para manter atual)</label>
                     <input type="password" id="editUserPassword" name="password">
                 </div>
                 <div class="modal-actions">
@@ -325,34 +310,44 @@
         </div>
     </div>
 
-    <!-- Modal: Add Child User -->
-    <div id="addChildUserModal" class="modal">
-        <div class="modal-content">
+    <!-- Modal: Client Details -->
+    <div id="clientDetailsModal" class="modal">
+        <div class="modal-content modal-content-wide">
             <div class="modal-header">
-                <h2>Adicionar Usuario Filho (Licenca)</h2>
+                <h2>Detalhes do Cliente</h2>
                 <button class="modal-close">&times;</button>
             </div>
-            <form id="addChildUserForm" class="modal-form">
-                <input type="hidden" id="childParentUserId" name="parent_user_id">
+            <div id="clientDetailsContent" class="client-details-content">
+                <p class="license-loading">Carregando detalhes...</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary modal-cancel">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add License -->
+    <div id="addLicenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Licença</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="addLicenseForm" class="modal-form">
                 <div class="form-group">
-                    <label for="childUsername">Usuario *</label>
-                    <input type="text" id="childUsername" name="username" required>
+                    <label for="licenseClientSelect">Cliente *</label>
+                    <select id="licenseClientSelect" name="parent_user_id" required>
+                        <option value="">Selecione um cliente</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="childPassword">Senha *</label>
-                    <input type="password" id="childPassword" name="password" required>
+                    <label for="licenseCount">Quantidade</label>
+                    <input type="number" id="licenseCount" name="count" min="1" value="1" required>
                 </div>
-                <div class="form-group">
-                    <label for="childFullName">Nome Completo</label>
-                    <input type="text" id="childFullName" name="full_name">
-                </div>
-                <div class="form-group">
-                    <label for="childEmail">Email</label>
-                    <input type="email" id="childEmail" name="email">
-                </div>
+                <p class="form-hint">O usuário será gerado automaticamente (ex: 1nomecliente, 2nomecliente...) e a senha também.</p>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Criar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar Licença</button>
                 </div>
             </form>
         </div>
@@ -367,38 +362,42 @@
             </div>
             <form id="addAppForm" class="modal-form">
                 <div class="form-group">
-                    <label for="appName">Nome *</label>
-                    <input type="text" id="appName" name="name" required>
-                </div>
-                <div class="form-group">
                     <label for="appClientId">Cliente *</label>
                     <select id="appClientId" name="client_id" required>
                         <option value="">Selecione um cliente</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="appAndroidVersion">Versao Android</label>
-                    <input type="text" id="appAndroidVersion" name="android_version">
+                    <label for="appName">Nome do Aplicativo *</label>
+                    <input type="text" id="appName" name="name" required>
                 </div>
                 <div class="form-group">
-                    <label for="appPcVersion">Versao PC</label>
-                    <input type="text" id="appPcVersion" name="pc_version">
+                    <label for="appDescription">Descrição</label>
+                    <textarea id="appDescription" name="description" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="appSite">Site</label>
-                    <input type="url" id="appSite" name="site">
+                    <label for="appAndroidFile">Arquivo Android (APK)</label>
+                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk">
                 </div>
                 <div class="form-group">
-                    <label for="appAndroidFile">Arquivo Android</label>
-                    <input type="file" id="appAndroidFile" name="android_file">
+                    <label for="appAndroidVersion">Versão Android</label>
+                    <input type="text" id="appAndroidVersion" name="android_version" placeholder="1.0.0">
                 </div>
                 <div class="form-group">
-                    <label for="appPcFile">Arquivo PC</label>
-                    <input type="file" id="appPcFile" name="pc_file">
+                    <label for="appPcFile">Arquivo PC (EXE)</label>
+                    <input type="file" id="appPcFile" name="pc_file" accept=".exe">
+                </div>
+                <div class="form-group">
+                    <label for="appPcVersion">Versão PC</label>
+                    <input type="text" id="appPcVersion" name="pc_version" placeholder="1.0.0">
+                </div>
+                <div class="form-group">
+                    <label for="appWebsiteUrl">URL do Site</label>
+                    <input type="url" id="appWebsiteUrl" name="website_url" placeholder="https://">
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Criar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             </form>
         </div>

@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
+const crypto = require('crypto');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 require('dotenv').config();
@@ -137,6 +138,47 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+function isChildUser(user) {
+  return user?.is_child === 1 || user?.is_child === true;
+}
+
+async function resolveClientOwnerUserId(userId) {
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('id, is_child, parent_user_id')
+    .eq('id', userId)
+    .single();
+
+  if (error || !user) {
+    return null;
+  }
+
+  if (isChildUser(user) && user.parent_user_id) {
+    return user.parent_user_id;
+  }
+
+  return user.id;
+}
+
+async function getClientByUserId(userId) {
+  const ownerUserId = await resolveClientOwnerUserId(userId);
+  if (!ownerUserId) {
+    return null;
+  }
+
+  const { data: client, error } = await supabase
+    .from('clients')
+    .select('id, user_id, company_name, phone, address')
+    .eq('user_id', ownerUserId)
+    .single();
+
+  if (error || !client) {
+    return null;
+  }
+
+  return client;
+}
+
 // Rotas de autenticação
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
@@ -179,105 +221,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Rota de registro removida - apenas administrador pode criar usuários
-
-// Rota de recuperação de senha - Solicitar código
-app.post('/api/forgot-password', async (req, res) => {
-  const { contact } = req.body;
-
-  try {
-    // Buscar usuário por email ou telefone
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*, clients(phone)')
-      .eq('email', contact)
-      .or(`clients.phone.eq.${contact}`)
-      .single();
-
-    if (error || !user) {
-      // Por segurança, não informamos se o usuário existe ou não
-      return res.json({ message: 'Se o email/telefone estiver cadastrado, você receberá um código de recuperação.' });
-    }
-
-    // Gerar código de 6 dígitos
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
-
-    // Salvar código no banco de dados
-    const { error: insertError } = await supabase
-      .from('password_reset_codes')
-      .insert({
-        user_id: user.id,
-        code: code,
-        expires_at: expiresAt.toISOString()
-      });
-
-    if (insertError) {
-      return res.status(500).json({ error: 'Erro ao gerar código de recuperação' });
-    }
-
-    // Em produção, aqui você enviaria o código por email ou SMS
-    console.log(`Código de recuperação gerado para ${user.username}: ${code}`);
-
-    res.json({
-      message: 'Código de recuperação enviado com sucesso'
-    });
-  } catch (error) {
-    console.error('Erro na recuperação de senha:', error);
-    res.status(500).json({ error: 'Erro no servidor' });
-  }
-});
-
-// Rota de recuperação de senha - Validar código e redefinir senha
-app.post('/api/reset-password', async (req, res) => {
-  const { code, new_password, confirm_password } = req.body;
-
-  if (new_password !== confirm_password) {
-    return res.status(400).json({ error: 'As senhas não coincidem' });
-  }
-
-  try {
-    // Buscar código válido e não usado
-    const { data: resetCode, error } = await supabase
-      .from('password_reset_codes')
-      .select('*')
-      .eq('code', code)
-      .eq('used', 0)
-      .gt('expires_at', new Date().toISOString())
-      .single();
-
-    if (error || !resetCode) {
-      return res.status(400).json({ error: 'Código inválido ou expirado' });
-    }
-
-    // Atualizar senha do usuário
-    const hashedPassword = bcrypt.hashSync(new_password, 10);
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ password: hashedPassword })
-      .eq('id', resetCode.user_id);
-
-    if (updateError) {
-      return res.status(500).json({ error: 'Erro ao atualizar senha' });
-    }
-
-    // Marcar código como usado
-    const { error: markError } = await supabase
-      .from('password_reset_codes')
-      .update({ used: 1 })
-      .eq('id', resetCode.id);
-
-    if (markError) {
-      console.error('Erro ao marcar código como usado:', markError);
-    }
-
-    res.json({ message: 'Senha redefinida com sucesso' });
-  } catch (error) {
-    console.error('Erro ao redefinir senha:', error);
-    res.status(500).json({ error: 'Erro no servidor' });
-  }
-});
-
 // Rotas do painel administrativo
 app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
   try {
@@ -311,6 +254,56 @@ app.get('/api/admin/clients', authenticateToken, requireAdmin, async (req, res) 
     res.json(clients);
   } catch (error) {
     console.error('Erro ao buscar clientes:', error);
+    res.status(500).json({ error: 'Erro no servidor' });
+  }
+});
+
+app.get('/api/admin/clients/:id/details', authenticateToken, requireAdmin, async (req, res) => {
+  const clientId = req.params.id;
+
+  try {
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .select('*, users(id, username, full_name, email, created_at)')
+      .eq('id', clientId)
+      .single();
+
+    if (clientError || !client) {
+      return res.status(404).json({ error: 'Cliente não encontrado' });
+    }
+
+    const parentUserId = client.user_id;
+
+    const [licensesResult, applicationsResult] = await Promise.all([
+      supabase
+        .from('users')
+        .select('id, username, full_name, email, created_at')
+        .eq('parent_user_id', parentUserId)
+        .eq('is_child', 1)
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('applications')
+        .select('id, name, description, android_version, pc_version, website_url, created_at')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false })
+    ]);
+
+    if (licensesResult.error) {
+      return res.status(500).json({ error: 'Erro ao buscar licenças do cliente' });
+    }
+
+    if (applicationsResult.error) {
+      return res.status(500).json({ error: 'Erro ao buscar aplicativos do cliente' });
+    }
+
+    res.json({
+      client,
+      baseUser: client.users,
+      licenses: licensesResult.data || [],
+      applications: applicationsResult.data || []
+    });
+  } catch (error) {
+    console.error('Erro ao buscar detalhes do cliente:', error);
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });
@@ -499,19 +492,55 @@ app.delete('/api/admin/users/:id', authenticateToken, requireAdmin, async (req, 
   }
 });
 
-// Rotas para gerenciar usuários filhos (licenças)
-app.post('/api/admin/child-users', authenticateToken, requireAdmin, async (req, res) => {
-  const { parent_user_id, username, password, full_name, email } = req.body;
+async function generateLicenseUsername(parentUserId, parentUsername) {
+  const { count } = await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .eq('parent_user_id', parentUserId)
+    .eq('is_child', 1);
 
-  if (!parent_user_id || !username || !password) {
-    return res.status(400).json({ error: 'parent_user_id, username e password são obrigatórios' });
+  let licenseNum = (count || 0) + 1;
+  let username = `${licenseNum}${parentUsername}`;
+
+  while (true) {
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (!existing) break;
+    licenseNum++;
+    username = `${licenseNum}${parentUsername}`;
   }
 
+  return username;
+}
+
+// Rotas para gerenciar licenças adicionais
+app.post('/api/admin/child-users', authenticateToken, requireAdmin, async (req, res) => {
+  const { parent_user_id, count: licenseCount = 1 } = req.body;
+
+  if (!parent_user_id) {
+    return res.status(400).json({ error: 'Selecione um cliente' });
+  }
+
+  const count = Math.max(parseInt(licenseCount, 10) || 1, 1);
+
   try {
-    // Verificar se o cliente tem licenças disponíveis
+    const { data: parentUser, error: parentError } = await supabase
+      .from('users')
+      .select('id, username, full_name, email')
+      .eq('id', parent_user_id)
+      .single();
+
+    if (parentError || !parentUser) {
+      return res.status(404).json({ error: 'Cliente não encontrado' });
+    }
+
     const { data: client } = await supabase
       .from('clients')
-      .select('licenses, licenses_used')
+      .select('licenses_used')
       .eq('user_id', parent_user_id)
       .single();
 
@@ -519,117 +548,129 @@ app.post('/api/admin/child-users', authenticateToken, requireAdmin, async (req, 
       return res.status(404).json({ error: 'Cliente não encontrado' });
     }
 
-    if (client.licenses_used >= client.licenses) {
-      return res.status(400).json({ error: 'Limite de licenças atingido' });
-    }
+    const createdLicenses = [];
 
-    // Criar usuário filho
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const { data: childUser, error: userError } = await supabase
-      .from('users')
-      .insert({
-        username,
-        password: hashedPassword,
-        full_name,
-        email,
-        role: 'client',
-        parent_user_id,
-        is_child: 1
-      })
-      .select()
-      .single();
+    for (let i = 0; i < count; i++) {
+      const username = await generateLicenseUsername(parent_user_id, parentUser.username);
+      const password = crypto.randomBytes(4).toString('hex');
+      const hashedPassword = bcrypt.hashSync(password, 10);
 
-    if (userError) {
-      if (userError.code === '23505') {
-        return res.status(400).json({ error: 'Usuário já existe' });
+      const { data: licenseUser, error: userError } = await supabase
+        .from('users')
+        .insert({
+          username,
+          password: hashedPassword,
+          full_name: parentUser.full_name,
+          email: parentUser.email,
+          role: 'client',
+          parent_user_id,
+          is_child: 1
+        })
+        .select()
+        .single();
+
+      if (userError) {
+        if (userError.code === '23505') {
+          return res.status(400).json({ error: 'Não foi possível gerar um usuário único para a licença' });
+        }
+        return res.status(500).json({ error: 'Erro ao criar licença' });
       }
-      return res.status(500).json({ error: 'Erro ao criar usuário filho' });
+
+      createdLicenses.push({ id: licenseUser.id, username, password });
     }
 
-    // Atualizar contador de licenças usadas
+    const newLicensesUsed = (client.licenses_used || 0) + count;
     const { error: updateError } = await supabase
       .from('clients')
-      .update({ licenses_used: client.licenses_used + 1 })
+      .update({
+        licenses_used: newLicensesUsed,
+        licenses: newLicensesUsed + 1
+      })
       .eq('user_id', parent_user_id);
 
     if (updateError) {
       console.error('Erro ao atualizar licenças usadas:', updateError);
     }
 
-    res.json({ message: 'Usuário filho criado com sucesso', userId: childUser.id });
+    res.json({
+      message: count === 1 ? 'Licença adicionada com sucesso' : `${count} licenças adicionadas com sucesso`,
+      licenses: createdLicenses
+    });
   } catch (error) {
-    console.error('Erro ao criar usuário filho:', error);
+    console.error('Erro ao criar licença:', error);
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });
 
 app.get('/api/admin/child-users/:parent_id', authenticateToken, requireAdmin, async (req, res) => {
-  const parentId = req.params.id;
+  const parentId = req.params.parent_id;
 
   try {
-    const { data: childUsers, error } = await supabase
+    const { data: licenseUsers, error } = await supabase
       .from('users')
       .select('*')
       .eq('parent_user_id', parentId)
-      .eq('is_child', 1);
+      .eq('is_child', 1)
+      .order('created_at', { ascending: true });
 
     if (error) {
-      return res.status(500).json({ error: 'Erro ao buscar usuários filhos' });
+      return res.status(500).json({ error: 'Erro ao buscar licenças' });
     }
 
-    res.json(childUsers);
+    res.json(licenseUsers);
   } catch (error) {
-    console.error('Erro ao buscar usuários filhos:', error);
+    console.error('Erro ao buscar licenças:', error);
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });
 
 app.delete('/api/admin/child-users/:id', authenticateToken, requireAdmin, async (req, res) => {
-  const childUserId = req.params.id;
+  const licenseUserId = req.params.id;
 
   try {
-    // Buscar usuário filho
-    const { data: childUser, error: childError } = await supabase
+    const { data: licenseUser, error: licenseError } = await supabase
       .from('users')
       .select('parent_user_id')
-      .eq('id', childUserId)
+      .eq('id', licenseUserId)
       .single();
 
-    if (childError || !childUser) {
-      return res.status(404).json({ error: 'Usuário filho não encontrado' });
+    if (licenseError || !licenseUser) {
+      return res.status(404).json({ error: 'Licença não encontrada' });
     }
 
-    // Excluir usuário filho
     const { error: deleteError } = await supabase
       .from('users')
       .delete()
-      .eq('id', childUserId);
+      .eq('id', licenseUserId);
 
     if (deleteError) {
-      return res.status(500).json({ error: 'Erro ao excluir usuário filho' });
+      return res.status(500).json({ error: 'Erro ao excluir licença' });
     }
 
-    // Atualizar contador de licenças usadas
     const { data: client } = await supabase
       .from('clients')
       .select('licenses_used')
-      .eq('user_id', childUser.parent_user_id)
+      .eq('user_id', licenseUser.parent_user_id)
       .single();
 
     if (client && client.licenses_used > 0) {
+      const newLicensesUsed = client.licenses_used - 1;
       const { error: updateError } = await supabase
         .from('clients')
-        .update({ licenses_used: client.licenses_used - 1 })
-        .eq('user_id', childUser.parent_user_id);
+        .update({
+          licenses_used: newLicensesUsed,
+          licenses: newLicensesUsed + 1
+        })
+        .eq('user_id', licenseUser.parent_user_id);
 
       if (updateError) {
         console.error('Erro ao atualizar licenças usadas:', updateError);
       }
     }
 
-    res.json({ message: 'Usuário filho excluído com sucesso' });
+    res.json({ message: 'Licença excluída com sucesso' });
   } catch (error) {
-    console.error('Erro ao excluir usuário filho:', error);
+    console.error('Erro ao excluir licença:', error);
     res.status(500).json({ error: 'Erro no servidor' });
   }
 });
@@ -783,11 +824,7 @@ app.get('/api/admin/applications', authenticateToken, requireAdmin, async (req, 
 // Rotas do cliente
 app.get('/api/client/applications', authenticateToken, async (req, res) => {
   try {
-    const { data: client } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('user_id', req.user.id)
-      .single();
+    const client = await getClientByUserId(req.user.id);
 
     if (!client) {
       return res.json([]);
@@ -812,10 +849,15 @@ app.get('/api/client/applications', authenticateToken, async (req, res) => {
 
 app.get('/api/client/profile', authenticateToken, async (req, res) => {
   try {
+    const ownerUserId = await resolveClientOwnerUserId(req.user.id);
+    if (!ownerUserId) {
+      return res.status(404).json({ error: 'Perfil não encontrado' });
+    }
+
     const { data: profile, error } = await supabase
       .from('users')
       .select('*, clients(company_name, phone, address)')
-      .eq('id', req.user.id)
+      .eq('id', ownerUserId)
       .single();
 
     if (error) {
@@ -846,9 +888,15 @@ io.on('connection', (socket) => {
   console.log('Cliente conectado:', socket.id);
 
   // Quando um cliente se conecta, ele pode se identificar com seu user_id
-  socket.on('join', (userId) => {
+  socket.on('join', async (userId) => {
     socket.join(`user_${userId}`);
     console.log(`Usuário ${userId} entrou na sala`);
+
+    const ownerUserId = await resolveClientOwnerUserId(userId);
+    if (ownerUserId && ownerUserId !== userId) {
+      socket.join(`user_${ownerUserId}`);
+      console.log(`Licença ${userId} também entrou na sala do cliente ${ownerUserId}`);
+    }
   });
 
   socket.on('disconnect', () => {
