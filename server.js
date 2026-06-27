@@ -716,14 +716,29 @@ app.delete('/api/admin/child-users/:id', authenticateToken, requireAdmin, async 
 });
 
 // Rotas de aplicativos (Admin)
-app.post('/api/admin/applications', authenticateToken, requireAdmin, upload.fields([
+function handleUpload(fields) {
+  return (req, res, next) => {
+    upload.fields(fields)(req, res, (err) => {
+      if (err) {
+        return next(err);
+      }
+      next();
+    });
+  };
+}
+
+app.post('/api/admin/applications', authenticateToken, requireAdmin, handleUpload([
   { name: 'android_file', maxCount: 1 },
   { name: 'pc_file', maxCount: 1 }
 ]), async (req, res) => {
   const { client_id, name, description, android_version, pc_version, website_url } = req.body;
 
-  const androidFile = req.files['android_file'] ? req.files['android_file'][0].filename : null;
-  const pcFile = req.files['pc_file'] ? req.files['pc_file'][0].filename : null;
+  if (!client_id || !String(name || '').trim()) {
+    return res.status(400).json({ error: 'Selecione um cliente e informe o nome do aplicativo' });
+  }
+
+  const androidFile = req.files?.android_file?.[0]?.filename || null;
+  const pcFile = req.files?.pc_file?.[0]?.filename || null;
   const normalizedWebsiteUrl = normalizeWebsiteUrl(website_url);
 
   try {
@@ -731,19 +746,20 @@ app.post('/api/admin/applications', authenticateToken, requireAdmin, upload.fiel
       .from('applications')
       .insert({
         client_id,
-        name,
-        description,
+        name: String(name).trim(),
+        description: description || null,
         android_file: androidFile,
-        android_version,
+        android_version: android_version || null,
         pc_file: pcFile,
-        pc_version,
+        pc_version: pc_version || null,
         website_url: normalizedWebsiteUrl
       })
       .select()
       .single();
 
     if (error) {
-      return res.status(500).json({ error: 'Erro ao criar aplicativo' });
+      console.error('Erro ao criar aplicativo:', error);
+      return res.status(500).json({ error: error.message || 'Erro ao criar aplicativo' });
     }
 
     // Buscar o user_id do cliente para notificar
@@ -764,15 +780,15 @@ app.post('/api/admin/applications', authenticateToken, requireAdmin, upload.fiel
   }
 });
 
-app.put('/api/admin/applications/:id', authenticateToken, requireAdmin, upload.fields([
+app.put('/api/admin/applications/:id', authenticateToken, requireAdmin, handleUpload([
   { name: 'android_file', maxCount: 1 },
   { name: 'pc_file', maxCount: 1 }
 ]), async (req, res) => {
   const appId = req.params.id;
   const { name, description, android_version, pc_version, website_url } = req.body;
 
-  const androidFile = req.files['android_file'] ? req.files['android_file'][0].filename : null;
-  const pcFile = req.files['pc_file'] ? req.files['pc_file'][0].filename : null;
+  const androidFile = req.files?.android_file?.[0]?.filename || null;
+  const pcFile = req.files?.pc_file?.[0]?.filename || null;
 
   try {
     const updateData = {

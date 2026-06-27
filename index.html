@@ -360,7 +360,7 @@
                 <h2>Novo Aplicativo</h2>
                 <button class="modal-close">&times;</button>
             </div>
-            <form id="addAppForm" class="modal-form">
+            <form id="addAppForm" class="modal-form" novalidate>
                 <div class="form-group">
                     <label for="appClientId">Cliente *</label>
                     <select id="appClientId" name="client_id" required>
@@ -377,7 +377,7 @@
                 </div>
                 <div class="form-group">
                     <label for="appAndroidFile">Arquivo Android (APK, AAB ou ZIP)</label>
-                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk,.aab,.zip,application/vnd.android.package-archive,application/zip">
+                    <input type="file" id="appAndroidFile" name="android_file" accept=".apk,.aab,.zip,.jpg,.jpeg,.png,.gif,.webp,.pdf,application/vnd.android.package-archive,application/zip,image/*,application/pdf">
                     <p class="form-hint">Formatos: APK, AAB, ZIP ou imagem/PDF para testes.</p>
                 </div>
                 <div class="form-group">
@@ -386,7 +386,7 @@
                 </div>
                 <div class="form-group">
                     <label for="appPcFile">Arquivo PC / Desktop (EXE, MSI ou ZIP)</label>
-                    <input type="file" id="appPcFile" name="pc_file" accept=".exe,.msi,.zip,application/x-msdownload,application/zip">
+                    <input type="file" id="appPcFile" name="pc_file" accept=".exe,.msi,.zip,.jpg,.jpeg,.png,.gif,.webp,.pdf,application/x-msdownload,application/zip,image/*,application/pdf">
                     <p class="form-hint">Formatos: EXE, MSI, ZIP ou imagem/PDF para testes.</p>
                 </div>
                 <div class="form-group">
@@ -395,8 +395,8 @@
                 </div>
                 <div class="form-group">
                     <label for="appWebsiteUrl">URL do Site</label>
-                    <input type="url" id="appWebsiteUrl" name="website_url" placeholder="https://seusite.com.br">
-                    <p class="form-hint">Pode colocar com ou sem https://</p>
+                    <input type="text" id="appWebsiteUrl" name="website_url" placeholder="seusite.com.br ou https://seusite.com.br">
+                    <p class="form-hint">Opcional. Pode colocar com ou sem https://</p>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary modal-cancel">Cancelar</button>

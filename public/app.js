@@ -659,30 +659,63 @@ async function addClient(formData) {
 }
 
 async function addApplication(formData) {
+  const submitBtn = document.querySelector('#addAppForm button[type="submit"]');
+  const originalLabel = submitBtn ? submitBtn.textContent : 'Salvar';
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Salvando...';
+  }
+
   try {
+    if (!formData.client_id) {
+      throw new Error('Selecione um cliente');
+    }
+
+    if (!String(formData.name || '').trim()) {
+      throw new Error('Informe o nome do aplicativo');
+    }
+
     const form = new FormData();
-    Object.keys(formData).forEach(key => {
-      const value = formData[key];
-      if (value instanceof File) {
-        if (value.size > 0) {
-          form.append(key, value);
-        }
-        return;
-      }
-      if (value !== undefined && value !== null && value !== '') {
-        form.append(key, value);
-      }
-    });
+    form.append('client_id', formData.client_id);
+    form.append('name', String(formData.name).trim());
+
+    if (formData.description) {
+      form.append('description', formData.description);
+    }
+    if (formData.android_version) {
+      form.append('android_version', formData.android_version);
+    }
+    if (formData.pc_version) {
+      form.append('pc_version', formData.pc_version);
+    }
+    if (formData.website_url) {
+      form.append('website_url', normalizeWebsiteUrl(formData.website_url));
+    }
+    if (formData.android_file instanceof File && formData.android_file.size > 0) {
+      form.append('android_file', formData.android_file);
+    }
+    if (formData.pc_file instanceof File && formData.pc_file.size > 0) {
+      form.append('pc_file', formData.pc_file);
+    }
 
     const response = await fetch(`${API_BASE}/admin/applications`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       },
       body: form
     });
 
-    const data = await response.json();
+    let data = {};
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(text || `Erro ${response.status} ao salvar aplicativo`);
+    }
 
     if (!response.ok) {
       throw new Error(data.error || 'Erro ao adicionar aplicativo');
@@ -694,6 +727,11 @@ async function addApplication(formData) {
     loadApplications();
   } catch (error) {
     showToast(error.message, 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalLabel;
+    }
   }
 }
 
@@ -703,7 +741,8 @@ async function loadClientsForSelect() {
     const select = document.getElementById('appClientId');
     select.innerHTML = '<option value="">Selecione um cliente</option>';
     clients.forEach(client => {
-      select.innerHTML += `<option value="${client.id}">${client.company_name || client.username}</option>`;
+      const label = client.company_name || client.users?.username || 'Cliente';
+      select.innerHTML += `<option value="${client.id}">${label}</option>`;
     });
   } catch (error) {
     showToast(error.message, 'error');
@@ -971,14 +1010,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add application form
   document.getElementById('addAppForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
+    const form = e.target;
+
+    if (!form.client_id.value) {
+      showToast('Selecione um cliente', 'error');
+      return;
+    }
+
+    if (!form.name.value.trim()) {
+      showToast('Informe o nome do aplicativo', 'error');
+      return;
+    }
+
     const appData = {
-      client_id: formData.get('client_id'),
-      name: formData.get('name'),
-      description: formData.get('description'),
-      android_version: formData.get('android_version'),
-      pc_version: formData.get('pc_version'),
-      website_url: formData.get('website_url'),
+      client_id: form.client_id.value,
+      name: form.name.value,
+      description: form.description.value,
+      android_version: form.android_version.value,
+      pc_version: form.pc_version.value,
+      website_url: form.website_url.value,
       android_file: document.getElementById('appAndroidFile').files[0],
       pc_file: document.getElementById('appPcFile').files[0]
     };
